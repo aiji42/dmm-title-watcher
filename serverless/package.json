@@ -1,0 +1,20 @@
+{
+  "name": "dmm-title-watcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@slack/web-api": "^5.0.1",
+    "aws-sdk": "^2.480.0",
+    "dmm.js": "^0.1.0",
+    "dynamodb": "^1.2.0",
+    "dynamodb-marshaler": "^2.0.0",
+    "serverless-offline": "^5.4.4",
+    "serverless-offline-dynamodb-streams": "^2.0.0"
+  }
+}

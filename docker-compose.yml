@@ -1,0 +1,27 @@
+version: '3.5'
+services:
+  serverless:
+    build:
+      context: ./serverless
+      args:
+        - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    ports:
+      - 3000:3000
+    restart: on-failure
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./serverless:/app
+      - node_modules:/app/node_modules
+    env_file: .env
+    command: bash -c "npm install && ./script/create-dynamodb-local-tables.sh && sls offline -o 0.0.0.0"
+    links:
+      - dynamodb
+  dynamodb:
+    image: cnadiminti/dynamodb-local:latest
+    ports:
+      - 8000:8000
+    command: --sharedDb -inMemory
+volumes:
+  node_modules:

@@ -1,0 +1,15 @@
+version: '3.5'
+services:
+  serverless-prod:
+    build:
+      context: ./serverless
+      args:
+        - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./serverless:/app
+      - /app/node_modules
+    env_file: .env
+    command: bash -c "npm install --production && sls deploy -v -s prod"
