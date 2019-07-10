@@ -6,11 +6,17 @@ jobs:
       - checkout
       - run:
           name: Build Docker Image
-          command: docker-compose -f docker-compose.test.yml build
+          command: docker-compose build
+          environment:
+            AWS_ACCESS_KEY_ID: root
+            AWS_SECRET_ACCESS_KEY: root
+            AWS_DEFAULT_REGION: localhost
       - run:
           name: Run tests
+          environment:
+            SLACK_CHANNEL_ID: ${SLACK_CHANNEL_ID_TEST}
           command: |
-            docker-compose -f docker-compose.test.yml run serverless-test bash -c '\
+            docker-compose run serverless bash -c '\
               npm install && \
               npm test'
   deploy:
@@ -19,11 +25,11 @@ jobs:
       - checkout
       - run:
           name: Build Docker Image
-          command: docker-compose -f docker-compose.prod.yml build
+          command: docker-compose build
       - run:
           name: Deploy
           command: |
-            docker-compose -f docker-compose.prod.yml run serverless-prod bash -c '\
+            docker-compose run serverless bash -c '\
               npm install && \
               sls deploy -v -s prod'
 
