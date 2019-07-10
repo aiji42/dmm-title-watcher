@@ -18,6 +18,7 @@ $ docker-compose up # 開発環境立ち上げ
 $ docker-compose run --rm serverless npm test # テスト
 
 $ docker-compose -f docker-compose.prod.yml up # 本番リリース
+# CircleCIに対応しているので、そちらでデプロイしたほうがいい
 ```
 
 ## Requirement
@@ -30,6 +31,7 @@ $ docker-compose -f docker-compose.prod.yml up # 本番リリース
     - AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY (AWS_DEFAULT_REGION) それぞれ取得しておく
 - Docker
     - インストールしておく
+- CircleCI
 
 ## Licence
 
