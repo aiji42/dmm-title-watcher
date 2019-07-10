@@ -6,7 +6,7 @@ jobs:
       - checkout
       - run:
           name: Build Docker Image
-          command: docker-compose build
+          command: docker-compose -f docker-compose.test.yml build
       - run:
           name: Run tests
           command: docker-compose -f docker-compose.test.yml run --rm serverless-test bash -c "npm install && npm test"
