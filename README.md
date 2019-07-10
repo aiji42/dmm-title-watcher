@@ -1,5 +1,7 @@
 # dmm-title-watcher
 
+[![CircleCI](https://circleci.com/gh/aiji42/dmm-title-watcher/tree/master.svg?style=svg)](https://circleci.com/gh/aiji42/dmm-title-watcher/tree/master)
+
 ## Description
 
 監視条件(Subscription)を登録して、定期的に新着タイトルがあるかどうかの通知を Slack で受ける  
