@@ -4,17 +4,15 @@ jobs:
     machine: true
     steps:
       - checkout
+      - run: echo "export AWS_ACCESS_KEY_ID=root" >> $BASH_ENV
+      - run: echo "export AWS_SECRET_ACCESS_KEY=root" >> $BASH_ENV
+      - run: echo "export AWS_DEFAULT_REGION=localhost" >> $BASH_ENV
+      - run: echo "export SLACK_CHANNEL_ID=${SLACK_CHANNEL_ID_TEST}" >> $BASH_ENV
       - run:
           name: Build Docker Image
           command: docker-compose build
-          environment:
-            AWS_ACCESS_KEY_ID: root
-            AWS_SECRET_ACCESS_KEY: root
-            AWS_DEFAULT_REGION: localhost
       - run:
           name: Run tests
-          environment:
-            SLACK_CHANNEL_ID: ${SLACK_CHANNEL_ID_TEST}
           command: |
             docker-compose run serverless bash -c '\
               npm install && \
