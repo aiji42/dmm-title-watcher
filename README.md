@@ -17,8 +17,7 @@ $ cp .env.sample .env.dev # 開発環境用.env
 $ docker-compose up # 開発環境立ち上げ
 $ docker-compose run --rm serverless npm test # テスト
 
-$ docker-compose -f docker-compose.prod.yml up # 本番リリース
-# CircleCIに対応しているので、そちらでデプロイしたほうがいい
+# デプロイはCircleCI
 ```
 
 ## Requirement
