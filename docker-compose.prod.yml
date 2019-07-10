@@ -11,5 +11,10 @@ services:
     volumes:
       - ./serverless:/app
       - /app/node_modules
-    env_file: .env
+    environment:
+      - AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+      - DMM_API_ID=$DMM_API_ID
+      - DMM_AFFILIATE_ID=$DMM_AFFILIATE_ID
+      - SLACK_TOKEN=$SLACK_TOKEN
+      - SLACK_CHANNEL_ID=$SLACK_CHANNEL_ID
     command: bash -c "npm install && sls deploy -v -s prod"

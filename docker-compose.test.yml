@@ -4,8 +4,8 @@ services:
     build:
       context: ./serverless
       args:
-        - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-        - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+        - AWS_ACCESS_KEY_ID=root
+        - AWS_SECRET_ACCESS_KEY=root
     ports:
       - 3001:3001
     tty: true
@@ -13,7 +13,12 @@ services:
     volumes:
       - ./serverless:/app
       - node_modules:/app/node_modules
-    env_file: .env.dev
+    environment:
+      - AWS_DEFAULT_REGION=localhost
+      - DMM_API_ID=$DMM_API_ID
+      - DMM_AFFILIATE_ID=$DMM_AFFILIATE_ID
+      - SLACK_TOKEN=$SLACK_TOKEN
+      - SLACK_CHANNEL_ID=$SLACK_CHANNEL_ID_TEST
     command: bash -c "npm install && npm test"
     links:
       - dynamodb

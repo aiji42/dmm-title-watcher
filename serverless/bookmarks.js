@@ -7,7 +7,7 @@ module.exports.create = (event, context, callback) => {
   Product.asyncGet(event.pathParameters.id)
     .then(product => {
       if (! product) throw 'Not found product'
-      Bookmark.asyncCreate({
+      return Bookmark.asyncCreate({
         productId: product.get('id'),
         saleStartDate: product.get('info').date,
         productInfo: product.get('info')
