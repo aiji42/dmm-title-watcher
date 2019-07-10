@@ -22,7 +22,8 @@ jobs:
           command: docker-compose -f docker-compose.prod.yml build
       - run:
           name: Deploy
-          command: docker-compose -f docker-compose.prod.yml run serverless-prod bash -c '\
+          command: |
+            docker-compose -f docker-compose.prod.yml run serverless-prod bash -c '\
               npm install && \
               sls deploy -v -s prod'
 
