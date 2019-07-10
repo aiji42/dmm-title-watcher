@@ -9,7 +9,18 @@ jobs:
           command: docker-compose -f docker-compose.test.yml build
       - run:
           name: Run tests
-          command: docker-compose -f docker-compose.test.yml run serverless-test bash -c "ls -l && npm install && npm test"
+           |
+            docker-compose run app-servie-name /bin/bash -c '\
+              cp .env.example .env && \
+              composer install --no-interaction && \
+              php artisan key:generate && \
+              ./artisan migrate:refresh && \
+              ./vendor/bin/phpunit -c phpunit.circle.xml'
+          command: |
+            docker-compose -f docker-compose.test.yml run serverless-test bash -c '\
+              ls -l && \
+              npm install && \
+              npm test'
   deploy:
     machine: true
     steps:
