@@ -1,0 +1,17 @@
+[
+  {
+    "name": "新着 デビュー作品",
+    "condition": {
+      "site": "FANZA",
+      "service": "digital",
+      "loor": "videoa",
+      "article": "genre",
+      "article_id": 6006,
+      "gte_date": "#TODAY",
+      "hits": 10
+    },
+    "exceptCondition": {
+      "genre": [ 3036, 6793 ]
+    }
+  }
+]

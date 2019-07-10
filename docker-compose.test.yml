@@ -1,21 +1,20 @@
 version: '3.5'
 services:
-  serverless:
+  serverless-test:
     build:
       context: ./serverless
       args:
         - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
         - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
     ports:
-      - 3000:3000
-    restart: on-failure
+      - 3001:3001
     tty: true
     stdin_open: true
     volumes:
       - ./serverless:/app
       - node_modules:/app/node_modules
     env_file: .env.dev
-    command: bash -c "npm install && ./script/create-dynamodb-dev-tables.sh && sls offline -o 0.0.0.0"
+    command: bash -c "npm install && npm test"
     links:
       - dynamodb
   dynamodb:

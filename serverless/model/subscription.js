@@ -1,6 +1,7 @@
 'use strict'
 
 const request = require('request')
+const util = require('util')
 const { Subscription } = require('./table-schema')
 const { Product } = require('./product')
 const { DMMClient } = require('../util/dmm-client')
@@ -8,8 +9,9 @@ const { DMMClient } = require('../util/dmm-client')
 Subscription.prototype.getProductsByAPI = function() {
   return new Promise((resolve, reject) => {
     DMMClient.asyncProduct(this.preparedCondition())
-      .then(data => {
-        Subscription.update({id: this.get('id'), failedCount: 0})
+    .then(data => {
+      Subscription.asyncUpdate({id: this.get('id'), failedCount: 0})
+      .then(() => {
         const products = []
         data.result.items.forEach(product => {
           if (this.isMatchedExcept(product)) return
@@ -17,10 +19,11 @@ Subscription.prototype.getProductsByAPI = function() {
         })
         resolve(products)
       })
-      .catch(err => {
-        Subscription.update({id: this.get('id'), failedCount: this.get('failedCount') + 1})
-        reject(err)
-      })
+    })
+    .catch(err => {
+      Subscription.asyncUpdate({id: this.get('id'), failedCount: this.get('failedCount') + 1})
+      .then(() => reject(err))
+    })
   })
 }
 
@@ -56,17 +59,6 @@ Subscription.getActiveItems = function() {
         .exec((err, data) => {
           if (err) reject(err)
           else resolve(data.Items)
-        })
-  })
-}
-
-Subscription.all = function(attributes) {
-  return new Promise((resolve, reject) => {
-    this.scan()
-        .attributes(attributes)
-        .exec((err, data) => {
-          if (err) reject(err)
-          else resolve(data)
         })
   })
 }

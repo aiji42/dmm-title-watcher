@@ -20,10 +20,10 @@
 # EOF
 
 # 深田えいみ
-# curl http://localhost:3000/subscriptions/actress/1048468/subscribe
+curl http://localhost:3000/subscriptions/actress/1048468/subscribe
 
 # 桜空もも
-curl http://localhost:3000/subscriptions/actress/1039157/subscribe
+# curl http://localhost:3000/subscriptions/actress/1039157/subscribe
 
 # 天使もえ
 # curl http://localhost:3000/subscriptions/actress/1025419/subscribe

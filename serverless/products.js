@@ -19,8 +19,9 @@ module.exports.search = (event, context, callback) => {
 
   Subscription.asyncGetItems(ids)
     .then(subscriptions => {
+      if (subscriptions.length < 1) throw 'Not found subscription'
       const getProducts = subscriptions.map(subscription => subscription.getProductsByAPI())
-      Promise.all(getProducts).then(products => products[0].forEach(product => product.save()))
+      return Promise.all(getProducts).then(products => products[0].forEach(product => product.save()))
     })
     .then(() => {
       callback(null, {
@@ -31,13 +32,22 @@ module.exports.search = (event, context, callback) => {
       })
     })
     .catch((err) => {
-      console.error(err)
-      callback(null, {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: `Unable to search products ids: ${id.join(', ')}`
+      if (err == 'Not found subscription') {
+        callback(null, {
+          statusCode: 404,
+          body: JSON.stringify({
+            message: `Not found subscription ids: ${ids.join(', ')}`
+          })
         })
-      })
+      } else {
+        console.error(err)
+        callback(null, {
+          statusCode: 500,
+          body: JSON.stringify({
+            message: `Unable to search products ids: ${ids.join(', ')}`
+          })
+        })
+      }
     })
 }
 

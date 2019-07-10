@@ -3,7 +3,7 @@
 const dynamo = require('dynamodb')
 const Joi = require('joi')
 let config = {}
-if (process.env.STAGE == 'dev') {
+if (process.env.STAGE != 'prod') {
   config = {
     region: 'localhost',
     endpoint: 'http://dynamodb:8000'
@@ -54,6 +54,29 @@ models.forEach(model => {
     const asyncMethod = `async${method.charAt(0).toUpperCase() + method.slice(1)}`
     model[asyncMethod] = util.promisify(model[method])
   })
+})
+
+function asyncAll(attributes) {
+  return new Promise((resolve, reject) => {
+    this.scan()
+        .attributes(attributes)
+        .exec((err, data) => {
+          if (err) reject(err)
+          else resolve(data)
+        })
+  })
+}
+
+function asyncTrancate() {
+  return this.asyncAll(['id'])
+    .then(data => {
+      return Promise.all(data.Items.map(m => this.asyncDestroy(m.get('id'))))
+    })
+}
+
+models.forEach(model => {
+  model['asyncAll'] = asyncAll
+  model['asyncTrancate'] = asyncTrancate
 })
 
 module.exports.Subscription = Subscription

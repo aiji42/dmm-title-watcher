@@ -22,8 +22,8 @@ service: dmm-title-watcher # NOTE: update this with your service name
 provider:
   name: aws
   runtime: nodejs10.x
-  region: ap-northeast-1
-  stage: ${opt:stage, self:custom.default.stage}
+  region: ${env:AWS_DEFAULT_REGION}
+  stage: ${opt:stage, 'dev'}
   timeout: 60
   environment:
     STAGE: ${self:provider.stage}
@@ -62,15 +62,15 @@ provider:
 package:
   exclude:
     - script/**
+    - test/**
     - Dockerfile
 
 plugins:
- - serverless-offline-dynamodb-streams
- - serverless-offline
+  - serverless-offline-dynamodb-streams
+  - serverless-offline
+  - serverless-mocha-plugin
 
 custom:
-  default:
-    stage: dev
   table:
     products: ${self:service}-${self:provider.stage}-products
     subscriptions: ${self:service}-${self:provider.stage}-subscriptions
@@ -83,6 +83,7 @@ custom:
           - Ref: ApiGatewayRestApi
           - .execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}
     dev: http://localhost:3000
+    test: http://localhost:3001
   serverless-offline-dynamodb-streams:
     endpoint: http://dynamodb:8000
     region: ${self:provider.region}

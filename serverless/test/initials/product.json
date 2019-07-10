@@ -1,0 +1,89 @@
+[
+  {
+    "id": "ssni00528",
+    "info": {
+      "service_code": "digital",
+      "service_name": "動画",
+      "floor_code": "videoa",
+      "floor_name": "ビデオ",
+      "category_name": "ビデオ (動画)",
+      "content_id": "ssni00528",
+      "product_id": "ssni00528",
+      "title": "新人NO.1STYLE 芸能人ひなたまりん",
+      "volume": "149",
+      "URL": "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=ssni00528/",
+      "URLsp": "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=ssni00528/",
+      "affiliateURL": "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=ssni00528/aiji42-990",
+      "affiliateURLsp": "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=ssni00528/aiji42-990",
+      "imageURL": {
+        "list": "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528pt.jpg",
+        "small": "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528ps.jpg",
+        "large": "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528pl.jpg"
+      },
+      "sampleImageURL": {
+        "sample_s": {
+          "image": [
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-1.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-2.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-3.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-4.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-5.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-6.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-7.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-8.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-9.jpg",
+            "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528-10.jpg"
+          ]
+        }
+      },
+      "sampleMovieURL": {
+        "size_476_306": "https://www.dmm.co.jp/litevideo/-/part/=/cid=9ssni528/size=476_306/",
+        "size_560_360": "https://www.dmm.co.jp/litevideo/-/part/=/cid=9ssni528/size=560_360/",
+        "size_644_414": "https://www.dmm.co.jp/litevideo/-/part/=/cid=9ssni528/size=644_414/",
+        "size_720_480": "https://www.dmm.co.jp/litevideo/-/part/=/cid=9ssni528/size=720_480/",
+        "pc_flag": 1,
+        "sp_flag": 1
+      },
+      "prices": {
+        "price": "1980~",
+        "deliveries": {
+          "delivery":[
+            {"type": "hd", "price": "2480"},
+            {"type": "download", "price": "1980"},
+            {"type": "stream", "price": "1980"},
+            {"type": "androiddl","price": "1980"},
+            {"type": "iosdl","price": "1980"}
+          ]
+        }
+      },
+      "date": "2019-07-13 10:00:00",
+      "iteminfo": {
+        "genre": [
+          {"id":6017,"name": "ギリモザ"},
+          {"id":6006,"name": "デビュー作品"},
+          {"id":4118,"name": "アイドル・芸能人"},
+          {"id":2006,"name": "スレンダー"},
+          {"id":2001,"name": "巨乳"},
+          {"id":4025,"name": "単体作品"},
+          {"id":6548,"name": "独占配信"},
+          {"id":6533,"name": "ハイビジョン"}
+        ],
+        "series": [
+          {"id":78603,"name": "新人NO.1 STYLE"}
+        ],
+        "maker": [
+          {"id":3152,"name": "エスワン ナンバーワンスタイル"}
+        ],
+        "actress": [
+          {"id":1053543,"name": "ひなたまりん", "ruby": "ひなたまりん"}
+        ],
+        "director":[
+          {"id":101612,"name": "紋℃","ruby": "もんど"}
+        ],
+        "label": [
+          {"id":3474,"name": "S1 NO.1 STYLE"}
+        ]
+      }
+    }
+  }
+]

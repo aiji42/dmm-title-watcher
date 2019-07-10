@@ -22,9 +22,11 @@ Product.prototype.notifySlack = function() {
 
   const message = {
     channel: channel,
+    username: '新着お知らせ',
+    icon_emoji: ':new:',
     attachments: [
       {
-        fallback: '【新着】条件にマッチする新着タイトルが見つかりました。',
+        fallback: '条件にマッチする新着タイトルが見つかりました。',
         title: this.title(),
         title_link: this.dmmLink(),
         text: `${this.saleStartDate()}発売`,
@@ -55,9 +57,11 @@ Product.prototype.notifySlack = function() {
 Product.prototype.remindNotifySlack = function() {
   const message = {
     channel: channel,
+    username: 'リマインダー',
+    icon_emoji: ':arrows_counterclockwise:',
     attachments: [
       {
-        fallback: '【リマインド】ブックマークしていたタイトルが発売されました。',
+        fallback: 'ブックマークしていたタイトルが発売されました。',
         title: 'リマインド',
         color: 'danger',
         text: [
