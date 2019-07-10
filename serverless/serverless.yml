@@ -1,4 +1,4 @@
-# Welcome to Serverless!
+\# Welcome to Serverless!
 #
 # This file is the main config file for your service.
 # It's very minimal at this point and uses default values.
@@ -24,7 +24,7 @@ provider:
   runtime: nodejs10.x
   region: ${env:AWS_DEFAULT_REGION}
   stage: ${opt:stage, 'dev'}
-  timeout: 60
+  timeout: 30
   environment:
     STAGE: ${self:provider.stage}
     DMM_API_ID: ${env:DMM_API_ID}
@@ -143,6 +143,7 @@ functions:
               - StreamArn
   productsSearchAll:
     handler: products.searchAll
+    timeout: 60
     events:
       - schedule: cron(45 23 * * ? *) # JST 8:45 AM
   productsNotify:
