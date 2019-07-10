@@ -12,4 +12,4 @@ services:
       - ./serverless:/app
       - /app/node_modules
     env_file: .env
-    command: bash -c "npm install --production && sls deploy -v -s prod"
+    command: bash -c "npm install && sls deploy -v -s prod"
