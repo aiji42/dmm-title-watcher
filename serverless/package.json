@@ -15,9 +15,9 @@
     "dynamodb-marshaler": "^2.0.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.480.0",
+    "aws-sdk": "^2.490.0",
     "serverless-mocha-plugin": "^1.10.0",
-    "serverless-offline": "^5.4.4",
+    "serverless-offline": "^5.7.2",
     "serverless-offline-dynamodb-streams": "^2.0.0"
   }
 }

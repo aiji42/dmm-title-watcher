@@ -24,7 +24,7 @@ describe('Bookmarks', () => {
     })
 
     it('Created Bookmark', () => {
-      Bookmark.asyncGet(initialProduct.id).then(bookmark => expect(bookmark.get('productId')).to.be.equal(initialProduct.id))
+      return Bookmark.asyncGet(initialProduct.id).then(bookmark => expect(bookmark.get('productId')).to.be.equal(initialProduct.id))
     })
   })
 
@@ -46,7 +46,7 @@ describe('Bookmarks', () => {
     })
 
     it('Deleted Bookmark', () => {
-      Bookmark.asyncGet(initialProduct.id).then(bookmark => expect(bookmark).to.be.null)
+      return Bookmark.asyncGet(initialProduct.id).then(bookmark => expect(bookmark).to.be.null)
     })
   })
 
