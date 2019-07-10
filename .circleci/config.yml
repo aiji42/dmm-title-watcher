@@ -9,7 +9,7 @@ jobs:
           command: docker-compose -f docker-compose.test.yml build
       - run:
           name: Run tests
-          command: docker-compose -f docker-compose.test.yml run --rm serverless-test bash -c "npm install && npm test"
+          command: docker-compose -f docker-compose.test.yml run serverless-test bash -c "ls -l && npm install && npm test"
   deploy:
     machine: true
     steps:
