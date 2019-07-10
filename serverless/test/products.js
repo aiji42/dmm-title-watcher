@@ -3,7 +3,7 @@
 const mochaPlugin = require('serverless-mocha-plugin')
 const expect = mochaPlugin.chai.expect
 const { Subscription } = require('../model/subscription')
-const { Product } = require('../model/Product')
+const { Product } = require('../model/product')
 const initialSubscriptions = require('./initials/subscription.json')
 
 describe('Products', () => {

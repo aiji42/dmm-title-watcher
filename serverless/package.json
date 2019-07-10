@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "./script/create-dynamodb-test-tables.sh && sls offline -s test -P 3001 > /dev/null 2>&1 & sleep 5 && sls invoke test --stage test -t 60000"
+    "test": "./script/create-dynamodb-test-tables.sh && (sls offline -s test -P 3001 > /dev/null & sleep 10) && sls invoke test --stage test -t 60000"
   },
   "author": "",
   "license": "MIT",
