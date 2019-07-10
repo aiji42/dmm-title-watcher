@@ -46,7 +46,7 @@ describe('Bookmarks', () => {
     })
 
     it('Deleted Bookmark', () => {
-      return Bookmark.asyncGet(initialProduct.id).then(bookmark => expect(bookmark).to.be.null)
+      return Bookmark.asyncGet(initialProduct.id).then(bookmark => expect(bookmark).to.be.not.null)
     })
   })
 
