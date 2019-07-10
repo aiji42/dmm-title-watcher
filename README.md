@@ -31,7 +31,7 @@ $ docker-compose -f docker-compose.prod.yml up # 本番リリース
 
 ## Licence
 
-[MIT](https://github.com/aiji42/dmm-title-watcher/blob/master/LICENCE)
+[MIT](https://github.com/aiji42/dmm-title-watcher/blob/master/LICENSE)
 
 ## Author
 
