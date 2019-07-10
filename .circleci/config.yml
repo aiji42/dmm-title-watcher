@@ -11,7 +11,6 @@ jobs:
           name: Run tests
           command: |
             docker-compose -f docker-compose.test.yml run serverless-test bash -c '\
-              ls -l && \
               npm install && \
               npm test'
   deploy:
@@ -20,10 +19,12 @@ jobs:
       - checkout
       - run:
           name: Build Docker Image
-          command: docker-compose build
+          command: docker-compose -f docker-compose.prod.yml build
       - run:
           name: Deploy
-          command: docker-compose -f docker-compose.prod.yml up
+          command: docker-compose -f docker-compose.prod.yml run serverless-prod bash -c '\
+              npm install && \
+              sls deploy -v -s prod'
 
 workflows:
   version: 2
