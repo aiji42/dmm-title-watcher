@@ -1,34 +1,39 @@
+version: 2
+jobs:
+  - build:
+      machine: true
+      steps:
+        - checkout
+        - run:
+            name: Build Docker Image
+            command: docker-compose -f docker-compose.test.yml build
+        - run:
+            name: Run tests
+            command: |
+              docker-compose -f docker-compose.test.yml run serverless-test bash -c '\
+                ls -l && \
+                npm install && \
+                npm test'
+  - deploy:
+      machine: true
+      steps:
+        - checkout
+        - run:
+            name: Build Docker Image
+            command: docker-compose build
+        - run:
+            name: Deploy
+            command: docker-compose -f docker-compose.prod.yml up
+
 workflows:
   version: 2
-  build-test-and-deploy:
+  build-test-and-approval-deploy:
     jobs:
       - build:
-          machine: true
-          steps:
-            - checkout
-            - run:
-                name: Build Docker Image
-                command: docker-compose -f docker-compose.test.yml build
-            - run:
-                name: Run tests
-                command: |
-                  docker-compose -f docker-compose.test.yml run serverless-test bash -c '\
-                    ls -l && \
-                    npm install && \
-                    npm test'
       - hold:
           type: approval
           requires:
-           - build
+            - build
       - deploy:
           requires:
             - hold
-          machine: true
-          steps:
-            - checkout
-            - run:
-                name: Build Docker Image
-                command: docker-compose build
-            - run:
-                name: Deploy
-                command: docker-compose -f docker-compose.prod.yml up
