@@ -4,8 +4,8 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: echo "export AWS_ACCESS_KEY_ID=root" >> $BASH_ENV
-      - run: echo "export AWS_SECRET_ACCESS_KEY=root" >> $BASH_ENV
+      - run: echo "export AWS_ACCESS_KEY_ID=rootrootrootrootrootroot" >> $BASH_ENV
+      - run: echo "export AWS_SECRET_ACCESS_KEY=rootrootrootrootrootroot" >> $BASH_ENV
       - run: echo "export AWS_DEFAULT_REGION=localhost" >> $BASH_ENV
       - run: echo "export SLACK_CHANNEL_ID=${SLACK_CHANNEL_ID_TEST}" >> $BASH_ENV
       - run:

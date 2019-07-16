@@ -16,7 +16,7 @@ do
       --key-schema AttributeName=id,KeyType=HASH \
       --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
       --stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES \
-      > /dev/null 2> /dev/null
+      > /dev/null
   elif [ "$TABLE" = "dmm-title-watcher-dev-subscriptions" ]; then
     aws dynamodb --endpoint-url ${AWS_ENDPOINT_URL} create-table \
       --table-name ${TABLE} \
@@ -24,7 +24,7 @@ do
       --key-schema AttributeName=id,KeyType=HASH \
       --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
       --stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES \
-      > /dev/null 2> /dev/null
+      > /dev/null
   elif [ "$TABLE" = "dmm-title-watcher-dev-bookmarks" ]; then
     aws dynamodb --endpoint-url ${AWS_ENDPOINT_URL} create-table \
       --table-name ${TABLE} \
@@ -32,7 +32,7 @@ do
       --key-schema AttributeName=productId,KeyType=HASH \
       --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
       --stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES \
-      > /dev/null 2> /dev/null
+      > /dev/null
   elif [ "$TABLE" = "dmm-title-watcher-dev-torrents" ]; then
     aws dynamodb --endpoint-url ${AWS_ENDPOINT_URL} create-table \
       --table-name ${TABLE} \
@@ -40,7 +40,7 @@ do
       --key-schema '[{"AttributeName":"productId","KeyType":"HASH"},{"AttributeName":"torrentId","KeyType":"RANGE"}]' \
       --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
       --stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES \
-      > /dev/null 2> /dev/null
+      > /dev/null
   fi
   done &
 done

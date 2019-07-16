@@ -9,7 +9,7 @@ do
   until aws s3 --endpoint-url ${AWS_ENDPOINT_URL} ls s3://${BUCKET} > /dev/null 2> /dev/null
   do
   echo "Creating bucket $BUCKET"
-  aws s3 --endpoint-url ${AWS_ENDPOINT_URL} mb s3://${BUCKET} > /dev/null 2> /dev/null
+  aws s3 --endpoint-url ${AWS_ENDPOINT_URL} mb s3://${BUCKET} > /dev/null
   done &
 done
 
