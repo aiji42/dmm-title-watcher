@@ -3,7 +3,7 @@
 const { Torrent } = require('./model/torrent')
 
 module.exports.download = (event, context, callback) => {
-  Torrent.asyncGet(event.pathParameters.productId, event.pathParameters.torrentId)
+  Torrent.asyncGet(event.pathParameters.id, event.pathParameters.torrentId)
   .then(torrent => {
     if (! torrent) throw 'Not Found torrent'
     return torrent.download()
@@ -22,14 +22,14 @@ module.exports.download = (event, context, callback) => {
       callback(null, {
         statusCode: 404,
         body: JSON.stringify({
-          message: `Not Found torrent productId: ${event.pathParameters.productId}, torrentId: ${event.pathParameters.torrentId}`
+          message: `Not Found torrent productId: ${event.pathParameters.id}, torrentId: ${event.pathParameters.torrentId}`
         })
       })
     } else {
       callback(null, {
         statusCode: 500,
         body: JSON.stringify({
-          message: `Unable to download torrent productId: ${event.pathParameters.productId}, torrentId: ${event.pathParameters.torrentId}`
+          message: `Unable to download torrent productId: ${event.pathParameters.id}, torrentId: ${event.pathParameters.torrentId}`
         })
       })
     }

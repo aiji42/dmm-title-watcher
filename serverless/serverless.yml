@@ -172,7 +172,7 @@ functions:
     handler: torrents.download
     events:
       - http:
-          path: /products/{productId}/torrents/{torrentId}/download
+          path: /products/{id}/torrents/{torrentId}/download
           method: get
 
 resources:
