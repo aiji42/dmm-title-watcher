@@ -1,9 +1,11 @@
 'use strict'
 
 const { Product } = require('./table-schema')
+const { Torrent } = require('./torrent')
 const { WebClient } = require('@slack/web-api')
 const slack = new WebClient(process.env.SLACK_TOKEN)
 const channel = process.env.SLACK_CHANNEL_ID
+const { si } = require('nyaapi')
 
 Product.prototype.notifySlack = function() {
   const actresses = this.actresses().map(actress => `<${actressDMMLink(actress)}|${actress.name}>[<${actionsSubscribeLink(actress)}|購読>]`)
@@ -74,6 +76,64 @@ Product.prototype.remindNotifySlack = function() {
   }
 
   return slack.chat.postMessage(message)
+}
+
+Product.prototype.notifySlackWithTorrent = async function() {
+  const torrentInfos = await this.searchTorrent()
+  const torrents = await Promise.all(torrentInfos.map(torrentInfo => this.createTorrent(torrentInfo)))
+  const message = {
+    channel: channel,
+    username: 'ダウンロード可能',
+    icon_emoji: ':arrows_counterclockwise:',
+    attachments: [
+      {
+        fallback: 'Torrentファイル発見',
+        title: this.title(),
+        title_link: this.dmmLink(),
+        color: 'danger',
+        image_url: this.imageURL().large
+      },
+      ...torrents.map(torrent => {
+        return {
+          title: torrent.name(),
+          text: torrent.digest(),
+          color: 'good',
+          actions: [
+            {
+              type: 'button',
+              name: 'download',
+              text: 'ダウンロード',
+              style: 'danger',
+              url: torrent.downloadLink()
+            }
+          ]
+        }
+      })
+    ]
+  }
+
+  return await slack.chat.postMessage(message)
+}
+
+Product.prototype.searchTorrent = function() {
+  const pattern = /([a-zA-Z]{3,4}).*(\d{3})$/
+  const query = [
+    `${pattern.exec(this.get('id'))[1]} ${pattern.exec(this.get('id'))[2]}`,
+    null,             // リミットなし
+    {category: '2_2'} // カテゴリ 実写
+  ]
+  return new Promise((resolve, reject) => {
+    si.search(...query)
+    .then(results => {
+      resolve(results)
+    })
+    .catch(reject)
+  })
+}
+
+Product.prototype.createTorrent = function(torrentInfo) {
+  const torrentId = /.*\/(\d+)$/.exec(torrentInfo.links.page)[1]
+  return Torrent.asyncCreate({productId: this.get('id'), torrentId: torrentId, info: torrentInfo})
 }
 
 Product.prototype.title = function() {

@@ -4,16 +4,22 @@ const mochaPlugin = require('serverless-mocha-plugin')
 const expect = mochaPlugin.chai.expect
 const { Subscription } = require('../model/subscription')
 const { Product } = require('../model/product')
+const { Torrent } = require('../model/torrent')
 const initialSubscriptions = require('./initials/subscription.json')
+const initialProducts = require('./initials/product.json')
 
 describe('Products', () => {
   let subscriptionId = ''
+  const initialProduct = initialProducts[0]
   before(done => {
-    Subscription.asyncCreate(initialSubscriptions[0])
-      .then(subsc => {
-        subscriptionId = subsc.get('id')
-        done()
-      })
+    (async () => {
+      await Subscription.asyncCreateTable()
+      await Product.asyncCreateTable()
+      await Torrent.asyncCreateTable()
+      subscriptionId = (await Subscription.asyncCreate(initialSubscriptions[0])).get('id')
+      await Product.asyncCreate(initialProduct)
+      done()
+    })()
   })
 
   describe('Search', () => {
@@ -70,8 +76,26 @@ describe('Products', () => {
     })
   })
 
+  describe('RemindNotify', () => {
+    const wrapped = mochaPlugin.getWrapper('productsRemindNotify', '/products.js', 'remindNotify')
+    it('Regular request succeed', () => {
+      return wrapped.run({productId: initialProduct.id}).then(response => expect(response).to.be.equal('Sucessfully product remind notify slack'))
+    })
+  })
+
+  describe('SearchTorrentAndNotify', () => {
+    const wrapped = mochaPlugin.getWrapper('productsSearchTorrentAndNotify', '/products.js', 'searchTorrentAndNotify')
+    it('Regular request succeed', () => {
+      return wrapped.run({productId: initialProduct.id}).then(response => expect(response).to.be.equal('Sucessfully product search torrent and notify slack'))
+    })
+  })
+
   after(done => {
-    Promise.all([Subscription.asyncTrancate(), Product.asyncTrancate()])
-    .then(() => done())
+    (async () => {
+      await Product.asyncDeleteTable()
+      await Subscription.asyncDeleteTable()
+      await Torrent.asyncDeleteTable()
+      done()
+    })()
   })
 })

@@ -5,78 +5,88 @@ const { Bookmark } = require('./model/bookmark')
 
 module.exports.create = (event, context, callback) => {
   Product.asyncGet(event.pathParameters.id)
-    .then(product => {
-      if (! product) throw 'Not found product'
-      return Bookmark.asyncCreate({
-        productId: product.get('id'),
-        saleStartDate: product.get('info').date,
-        productInfo: product.get('info')
+  .then(product => {
+    if (! product) throw 'Not found product'
+    return Bookmark.asyncCreate({
+      productId: product.get('id'),
+      saleStartDate: product.get('info').date,
+      productInfo: product.get('info')
+    })
+  })
+  .then(bookmark => {
+    callback(null, {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: `Successfully create bookmark productId: ${event.pathParameters.id}`
       })
     })
-    .then(bookmark => {
+  })
+  .catch(err => {
+    if (err = 'Not found product') {
       callback(null, {
-        statusCode: 200,
+        statusCode: 404,
         body: JSON.stringify({
-          message: `Successfully create bookmark productId: ${event.pathParameters.id}`
+          message: `Not found product id: ${event.pathParameters.id}`
         })
       })
-    })
-    .catch(err => {
-      if (err = 'Not found product') {
-        callback(null, {
-          statusCode: 404,
-          body: JSON.stringify({
-            message: `Not found product id: ${event.pathParameters.id}`
-          })
-        })
-      } else {
-        console.error(err)
-        callback(null, {
-          statusCode: 500,
-          body: JSON.stringify({
-            message: `Unable to create bookmark productId: ${event.pathParameters.id}`
-          })
-        })
-      }
-    })
-}
-
-module.exports.delete = (event, context, callback) => {
-  Bookmark.asyncDestroy(event.pathParameters.id, {ReturnValues: 'ALL_OLD'})
-    .then(bookmark => {
-      if (! bookmark) {
-        callback(null, {
-          statusCode: 404,
-          body: JSON.stringify({
-            message: 'Not found bookmark id: ${event.pathParameters.id}'
-          })
-        })
-      } else {
-        callback(null, {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: 'Sucessfully deleted bookmark'
-          })
-        })
-      }
-    })
-    .catch(err => {
+    } else {
       console.error(err)
       callback(null, {
         statusCode: 500,
         body: JSON.stringify({
-          message: `Unable to delete bookmark productId: ${event.pathParameters.id}`
+          message: `Unable to create bookmark productId: ${event.pathParameters.id}`
         })
       })
+    }
+  })
+}
+
+module.exports.delete = (event, context, callback) => {
+  Bookmark.asyncDestroy(event.pathParameters.id, {ReturnValues: 'ALL_OLD'})
+  .then(bookmark => {
+    if (! bookmark) {
+      callback(null, {
+        statusCode: 404,
+        body: JSON.stringify({
+          message: 'Not found bookmark id: ${event.pathParameters.id}'
+        })
+      })
+    } else {
+      callback(null, {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: 'Sucessfully deleted bookmark'
+        })
+      })
+    }
+  })
+  .catch(err => {
+    console.error(err)
+    callback(null, {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: `Unable to delete bookmark productId: ${event.pathParameters.id}`
+      })
     })
+  })
 }
 
 module.exports.remind = (event, context, callback) => {
   Bookmark.scanRemindable()
-    .then(data => Promise.all(data.Items.map(bookmark => bookmark.remindNotifySlack())))
-    .then(() => callback(null, 'Sucessfully reminded bookmark'))
-    .catch(err => {
-      console.error(err)
-      callback(null, 'Unable to remind bookmark')
-    })
+  .then(data => Promise.all(data.Items.map(bookmark => bookmark.invokeRemindNotify())))
+  .then(() => callback(null, 'Sucessfully reminded bookmark'))
+  .catch(err => {
+    console.error(err)
+    callback(null, 'Unable to remind bookmark')
+  })
+}
+
+module.exports.searchAllTorrentable = (event, context, callback) => {
+  Bookmark.scanTorrentable()
+  .then(data => Promise.all(data.Items.map(bookmark => bookmark.invokeSearchTorrentAndNotify())))
+  .then(() => callback(null, 'Sucessfully search all torrentable bookmark'))
+  .catch(err => {
+    console.error(err)
+    callback(null, 'Unable to search all torrentable bookmark')
+  })
 }

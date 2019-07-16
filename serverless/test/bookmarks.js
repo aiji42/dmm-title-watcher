@@ -1,5 +1,7 @@
 'use strict'
 
+process.on('unhandledRejection', console.dir)
+
 const mochaPlugin = require('serverless-mocha-plugin')
 const expect = mochaPlugin.chai.expect
 const initialProducts = require('./initials/product.json')
@@ -10,7 +12,12 @@ describe('Bookmarks', () => {
   const initialProduct = initialProducts[0]
 
   before(done => {
-    Product.asyncCreate(initialProduct).then(() => done())
+    (async () => {
+      await Bookmark.asyncCreateTable()
+      await Product.asyncCreateTable()
+      await Product.asyncCreate(initialProduct)
+      done()
+    })()
   })
 
   describe('Create', () => {
@@ -26,12 +33,23 @@ describe('Bookmarks', () => {
     it('Created Bookmark', () => {
       return Bookmark.asyncGet(initialProduct.id).then(bookmark => expect(bookmark.get('productId')).to.be.equal(initialProduct.id))
     })
+
+    after(done => {
+      Product.asyncDestroy(initialProduct.id).then(() => done())
+    })
   })
 
   describe('Remind', () => {
     const wrapped = mochaPlugin.getWrapper('bookmarksRemind', '/bookmarks.js', 'remind')
     it('Succeed remind', () => {
       return wrapped.run({}).then(response => expect(response).to.be.equal('Sucessfully reminded bookmark'))
+    })
+  })
+
+  describe('SearchAllTorrentable', () => {
+    const wrapped = mochaPlugin.getWrapper('bookmarksSearchAllTorrentable', '/bookmarks.js', 'searchAllTorrentable')
+    it('Succeed search all torrentable', () => {
+      return wrapped.run({}).then(response => expect(response).to.be.equal('Sucessfully search all torrentable bookmark'))
     })
   })
 
@@ -51,7 +69,10 @@ describe('Bookmarks', () => {
   })
 
   after(done => {
-    Promise.all([Bookmark.asyncTrancate(), Product.asyncTrancate()])
-    .then(() => done())
+    (async () => {
+      await Bookmark.asyncDeleteTable()
+      await Product.asyncDeleteTable()
+      done()
+    })()
   })
 })

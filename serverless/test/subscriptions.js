@@ -8,6 +8,12 @@ const { Subscription } = require('../model/subscription')
 describe('Subscriptions', () => {
   const initialSubscription = initialSubscriptions[0]
   let targetId = ''
+  before(done => {
+    (async () => {
+      await Subscription.asyncCreateTable()
+      done()
+    })()
+  })
 
   describe('Create', () => {
     const wrapped = mochaPlugin.getWrapper('subscriptionsCreate', '/subscriptions.js', 'create')
@@ -78,6 +84,9 @@ describe('Subscriptions', () => {
   })
 
   after(done => {
-    Subscription.asyncTrancate().then(() => done())
+    (async () => {
+      await Subscription.asyncDeleteTable()
+      done()
+    })()
   })
 })

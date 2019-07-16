@@ -47,8 +47,21 @@ const Bookmark = dynamo.define('Bookmark', {
   }
 })
 
-const methods = ['get', 'getItems', 'create', 'update', 'destroy']
-const models = [Subscription, Product, Bookmark]
+const Torrent = dynamo.define('Torrent', {
+  tableName: process.env.TABLE_TORRENTS,
+  hashKey: 'productId',
+  rangeKey: 'torrentId',
+  timestamps : true,
+  schema: {
+    productId: Joi.string(),
+    torrentId: Joi.string(),
+    info: Joi.object(),
+    status: Joi.string().regex(/pending|running|completed/).default('pending')
+  }
+})
+
+const methods = ['get', 'getItems', 'create', 'update', 'destroy', 'createTable', 'deleteTable']
+const models = [Subscription, Product, Bookmark, Torrent]
 models.forEach(model => {
   methods.forEach(method => {
     const asyncMethod = `async${method.charAt(0).toUpperCase() + method.slice(1)}`
@@ -56,29 +69,7 @@ models.forEach(model => {
   })
 })
 
-function asyncAll(attributes) {
-  return new Promise((resolve, reject) => {
-    this.scan()
-        .attributes(attributes)
-        .exec((err, data) => {
-          if (err) reject(err)
-          else resolve(data)
-        })
-  })
-}
-
-function asyncTrancate() {
-  return this.asyncAll(['id'])
-    .then(data => {
-      return Promise.all(data.Items.map(m => this.asyncDestroy(m.get('id'))))
-    })
-}
-
-models.forEach(model => {
-  model['asyncAll'] = asyncAll
-  model['asyncTrancate'] = asyncTrancate
-})
-
 module.exports.Subscription = Subscription
 module.exports.Product = Product
 module.exports.Bookmark = Bookmark
+module.exports.Torrent = Torrent

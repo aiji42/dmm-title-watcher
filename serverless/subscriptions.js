@@ -20,23 +20,23 @@ module.exports.create = (event, context, callback) => {
   // TODO: ある程度のバリデーションは必要
 
   Subscription.asyncCreate({name: name, condition: condition, exceptCondition: exceptCondition})
-    .then((subscription) => {
-      callback(null, {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: `Sucessfully created subscription id: ${subscription.get('id')}`,
-        })
+  .then((subscription) => {
+    callback(null, {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: `Sucessfully created subscription id: ${subscription.get('id')}`,
       })
     })
-    .catch(err => {
-      console.error(err)
-      callback(null, {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: 'Unable to create subscription'
-        })
+  })
+  .catch(err => {
+    console.error(err)
+    callback(null, {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'Unable to create subscription'
       })
     })
+  })
 }
 
 module.exports.subscribeActress = (event, context, callback) => {
@@ -54,108 +54,108 @@ module.exports.subscribeActress = (event, context, callback) => {
   }
 
   DMMClient.asyncActress({actress_id: event.pathParameters.id})
-    .then(data => {
-      if (data.result.result_count < 1) throw ('Not Found actress')
-      const actress = data.result.actress[0]
-      return Subscription.asyncCreate({name: `新着 ${actress.name}`, condition: condition, exceptCondition: exceptCondition})
-    })
-    .then((subscription) => {
-      callback(null, {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: `Sucessfully subscribe name: ${subscription.get('name')}`,
-        })
+  .then(data => {
+    if (data.result.result_count < 1) throw 'Not Found actress'
+    const actress = data.result.actress[0]
+    return Subscription.asyncCreate({name: `新着 ${actress.name}`, condition: condition, exceptCondition: exceptCondition})
+  })
+  .then((subscription) => {
+    callback(null, {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: `Sucessfully subscribe name: ${subscription.get('name')}`,
       })
     })
-    .catch(err => {
-      if (err == 'Not Found actress') {
-        callback(null, {
-          statusCode: 404,
-          body: JSON.stringify({
-            message: `Not Found actress id: ${event.pathParameters.id}`,
-          })
+  })
+  .catch(err => {
+    if (err == 'Not Found actress') {
+      callback(null, {
+        statusCode: 404,
+        body: JSON.stringify({
+          message: `Not Found actress id: ${event.pathParameters.id}`,
         })
-      } else {
-        console.error(err)
-        callback(null, {
-          statusCode: 500,
-          body: JSON.stringify({
-            message: `Unable to subscribe actress id: ${event.pathParameters.id}`
-          })
+      })
+    } else {
+      console.error(err)
+      callback(null, {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: `Unable to subscribe actress id: ${event.pathParameters.id}`
         })
-      }
+      })
+    }
     })
 }
 
 module.exports.index = (event, context, callback) => {
   Subscription.asyncAll(['id', 'name'])
-    .then((subscriptions) => {
-      callback(null, {
-        statusCode: 200,
-        body: JSON.stringify(subscriptions.Items)
+  .then((subscriptions) => {
+    callback(null, {
+      statusCode: 200,
+      body: JSON.stringify(subscriptions.Items)
+    })
+  })
+  .catch(err => {
+    console.error(err)
+    callback(null, {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'Unable to get subscriptions'
       })
     })
-    .catch(err => {
-      console.error(err)
-      callback(null, {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: 'Unable to get subscriptions'
-        })
-      })
-    })
+  })
 }
 
 module.exports.show = (event, context, callback) => {
   Subscription.asyncGet(event.pathParameters.id)
-    .then(subscription => {
-      if (! subscription) {
-        callback(null, {
-          statusCode: 404,
-          body: JSON.stringify(`Not found subscription id: ${event.pathParameters.id}`)
-        })
-      } else {
-        callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(subscription.attrs)
-        })
-      }
-    })
-    .catch(err => {
-      console.error(err)
+  .then(subscription => {
+    if (! subscription) {
       callback(null, {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: `Unable to get subscription id: ${event.pathParameters.id}`
-        })
+        statusCode: 404,
+        body: JSON.stringify(`Not found subscription id: ${event.pathParameters.id}`)
+      })
+    } else {
+      callback(null, {
+        statusCode: 200,
+        body: JSON.stringify(subscription.attrs)
+      })
+    }
+  })
+  .catch(err => {
+    console.error(err)
+    callback(null, {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: `Unable to get subscription id: ${event.pathParameters.id}`
       })
     })
+  })
 }
 
 module.exports.delete = (event, context, callback) => {
   Subscription.asyncDestroy(event.pathParameters.id, {ReturnValues: 'ALL_OLD'})
-    .then((subscription) => {
-      if (! subscription) {
-        callback(null, {
-          statusCode: 404,
-          body: JSON.stringify(`Not found subscription id: ${event.pathParameters.id}`)
-        })
-      } else {
-        callback(null, {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: 'Sucessfully deleted subscription'
-          })
-        })
-      }
-    })
-    .catch(err => {
-      console.error(err)
+  .then((subscription) => {
+    if (! subscription) {
       callback(null, {
-        statusCode: 500,
+        statusCode: 404,
+        body: JSON.stringify(`Not found subscription id: ${event.pathParameters.id}`)
+      })
+    } else {
+      callback(null, {
+        statusCode: 200,
         body: JSON.stringify({
-          message: `Unable to delete subscription id: ${event.pathParameters.id}`
+          message: 'Sucessfully deleted subscription'
         })
       })
+    }
+  })
+  .catch(err => {
+    console.error(err)
+    callback(null, {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: `Unable to delete subscription id: ${event.pathParameters.id}`
+      })
     })
+  })
 }

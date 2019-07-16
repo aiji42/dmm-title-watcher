@@ -20,13 +20,23 @@ services:
       - DMM_AFFILIATE_ID=$DMM_AFFILIATE_ID
       - SLACK_TOKEN=$SLACK_TOKEN
       - SLACK_CHANNEL_ID=$SLACK_CHANNEL_ID
-    command: bash -c "npm install && ./script/create-dynamodb-dev-tables.sh && sls offline -o 0.0.0.0"
+      - BUCKET_TRANSMISSION_PROJECT=$BUCKET_TRANSMISSION_PROJECT
+    command: bash -c "npm install && ./script/create-dynamodb-dev-tables.sh && ./script/create-s3-dev-buckets.sh && sls offline -o 0.0.0.0"
     links:
       - dynamodb
+      - s3
   dynamodb:
     image: cnadiminti/dynamodb-local:latest
     ports:
       - 8000:8000
     command: --sharedDb -inMemory
+  s3:
+    image: minio/minio:latest
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: $AWS_ACCESS_KEY_ID
+      MINIO_SECRET_KEY: $AWS_SECRET_ACCESS_KEY
+    command: server /data
 volumes:
   node_modules:

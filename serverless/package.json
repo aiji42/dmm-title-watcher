@@ -4,7 +4,8 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "./script/create-dynamodb-test-tables.sh && (sls offline -s test -P 3001 > /dev/null 2>&1 & sleep 5) && sls invoke test --stage test -t 60000 --exit"
+    "test": "./script/create-s3-dev-buckets.sh && (sls offline -s test -P 3001 > /dev/null 2>&1 & sleep 5) && sls invoke test --stage test -t 10000 --exit",
+    "postinstall": "patch-package"
   },
   "author": "",
   "license": "MIT",
@@ -12,12 +13,14 @@
     "@slack/web-api": "^5.0.1",
     "dmm.js": "^0.1.0",
     "dynamodb": "^1.2.0",
-    "dynamodb-marshaler": "^2.0.0"
+    "dynamodb-marshaler": "^2.0.0",
+    "nyaapi": "^2.0.7"
   },
   "devDependencies": {
-    "aws-sdk": "^2.490.0",
+    "aws-sdk": "^2.493.0",
+    "patch-package": "^6.1.2",
     "serverless-mocha-plugin": "^1.10.0",
-    "serverless-offline": "^5.7.2",
+    "serverless-offline": "^5.7.3",
     "serverless-offline-dynamodb-streams": "^2.0.0"
   }
 }

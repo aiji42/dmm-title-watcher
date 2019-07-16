@@ -1,6 +1,6 @@
 'use strict'
 
-const request = require('request')
+const AWS = require('aws-sdk')
 const util = require('util')
 const { Subscription } = require('./table-schema')
 const { Product } = require('./product')
@@ -47,9 +47,14 @@ Subscription.prototype.isMatchedExcept = function(product) {
 }
 
 Subscription.prototype.invokeProductsSearch = function() {
-  const url = `${process.env.GW_URL}/subscriptions/${this.get('id')}/products/search`
-  const req = util.promisify(request)
-  return req({url: url, method: 'POST'})
+  const lambdaConfig = {}
+  if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
+  const lambda = new AWS.Lambda(lambdaConfig)
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({httpMethod: 'POST', pathParameters: this.get('id')})
+  }).promise()
 }
 
 Subscription.getActiveItems = function() {
@@ -59,6 +64,17 @@ Subscription.getActiveItems = function() {
         .exec((err, data) => {
           if (err) reject(err)
           else resolve(data.Items)
+        })
+  })
+}
+
+Subscription.asyncAll = function(attributes) {
+  return new Promise((resolve, reject) => {
+    this.scan()
+        .attributes(attributes)
+        .exec((err, data) => {
+          if (err) reject(err)
+          else resolve(data)
         })
   })
 }
