@@ -41,10 +41,13 @@ workflows:
     jobs:
       - build
       - slack/approval-notification:
-          type: approval
           message: デプロイを承認してください
+          requires:
+            - build
+      - hold:
+          type: approval
           requires:
             - build
       - deploy:
           requires:
-            - slack/approval-notification
+            - hold
