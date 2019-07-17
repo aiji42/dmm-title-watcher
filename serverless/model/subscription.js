@@ -53,7 +53,7 @@ Subscription.prototype.invokeProductsSearch = function() {
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH,
     InvocationType: 'Event',
-    Payload: JSON.stringify({httpMethod: 'POST', pathParameters: this.get('id')})
+    Payload: JSON.stringify({httpMethod: 'POST', pathParameters: {id: this.get('id')}})
   }).promise()
 }
 
