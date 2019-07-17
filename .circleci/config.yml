@@ -44,4 +44,4 @@ workflows:
           message: デプロイを承認してください
       - deploy:
           requires:
-            - hold
+            - slack/approval-notification
