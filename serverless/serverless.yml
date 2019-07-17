@@ -17,6 +17,9 @@ provider:
     TABLE_BOOKMARKS: ${self:custom.table.bookmarks}
     TABLE_TORRENTS: ${self:custom.table.torrents}
     GW_URL: ${self:custom.gw-url.${self:provider.stage}}
+    LAMBDA_NAME_SUBSCRIPTIONS_INDEX: ${self:service}-${self:provider.stage}-subscriptionsIndex
+    LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS:
+      ${self:service}-${self:provider.stage}-subscriptionsSubscribeActerss
     LAMBDA_NAME_PRODUCTS_SEARCH: ${self:service}-${self:provider.stage}-productsSearch
     LAMBDA_NAME_PRODUCTS_REMIND_NOTIFY:
       ${self:service}-${self:provider.stage}-productsRemindNotify
@@ -94,7 +97,7 @@ functions:
     events:
       - http:
           path: subscriptions/actress/{id}/subscribe
-          method: get
+          method: post
   subscriptionsIndex:
     handler: subscriptions.index
     events:
@@ -181,6 +184,12 @@ functions:
     events:
       - http:
           path: /slack/action-endpoint
+          method: post
+  slackCommand:
+    handler: slack.command
+    events:
+      - http:
+          path: /slack/command
           method: post
 
 resources:

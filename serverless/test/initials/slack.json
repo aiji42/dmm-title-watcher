@@ -154,5 +154,65 @@
     },
     "response_url": "https://hooks.slack.com/actions/*****/**/*******",
     "trigger_id": "**************"
+  },
+  {
+    "type": "interactive_message",
+    "actions": [
+      {
+        "name": "actress",
+        "type": "button",
+        "value": "1048468"
+      }
+    ],
+    "callback_id": "subscribe",
+    "team": {
+      "id": "****",
+      "domain": "****"
+    },
+    "channel": {
+      "id": "****",
+      "name": "****"
+    },
+    "user": {
+      "id": "****",
+      "name": "****"
+    },
+    "action_ts": "*********",
+    "message_ts": "**********",
+    "attachment_id": "1",
+    "token": "****",
+    "is_app_unfurl": false,
+    "original_message": {
+      "type": "message",
+      "subtype": "bot_message",
+      "text": "",
+      "ts": "**********",
+      "bot_id": "****",
+      "attachments": [
+      {
+        "fallback": "125x125px image",
+        "image_url": "http://pics.dmm.co.jp/mono/actjpgs/hukada_eimi.jpg",
+        "image_width": 125,
+        "image_height": 125,
+        "image_bytes": 6545,
+        "callback_id": "subscribe",
+        "title": "深田えいみ",
+        "id": 1,
+        "title_link": "https://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=1048468/",
+        "actions": [
+          {
+            "id": "1",
+            "name": "actress",
+            "text": "購読する",
+            "type": "button",
+            "value": "1048468",
+            "style": "primary"
+          }
+        ]
+      }
+    ]
+    },
+    "response_url": "https://hooks.slack.com/actions/*****/**/*******",
+    "trigger_id": "**************"
   }
 ]
