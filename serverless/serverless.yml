@@ -154,14 +154,14 @@ functions:
     handler: bookmarks.create
     events:
       - http:
-          path: /products/{id}/bookmarks/create
-          method: get
+          path: /products/{id}/bookmarks
+          method: post
   bookmarksDelete:
     handler: bookmarks.delete
     events:
       - http:
-          path: /products/{id}/bookmarks/delete
-          method: get
+          path: /products/{id}/bookmarks
+          method: delete
   bookmarksRemind:
     handler: bookmarks.remind
     events:
