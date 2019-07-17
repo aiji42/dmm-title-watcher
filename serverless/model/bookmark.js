@@ -4,6 +4,10 @@ const AWS = require('aws-sdk')
 const { Bookmark } = require('./table-schema')
 const { Product } = require('./product')
 
+const lambdaConfig = {}
+if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
+const lambda = new AWS.Lambda(lambdaConfig)
+
 Bookmark.scanRemindable = function() {
   const today = new Date()
   const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1, today.getHours(), today.getMinutes(), today.getSeconds())
@@ -30,7 +34,6 @@ Bookmark.scanTorrentable = function() {
 }
 
 Bookmark.prototype.invokRemindNotify = function() {
-  const lambda = new AWS.Lambda({endpoint: process.env.GW_URL})
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_PRODUCTS_REMIND_NOTIFY,
     InvocationType: 'Event',
@@ -39,9 +42,6 @@ Bookmark.prototype.invokRemindNotify = function() {
 }
 
 Bookmark.prototype.invokeSearchTorrentAndNotify = function() {
-  const lambdaConfig = {}
-  if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
-  const lambda = new AWS.Lambda(lambdaConfig)
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH_TORRENT_AND_NOTIFY,
     InvocationType: 'Event',
@@ -51,6 +51,26 @@ Bookmark.prototype.invokeSearchTorrentAndNotify = function() {
 
 Bookmark.prototype.getProduct = function() {
   return new Product({id: this.get('productId'), info: this.get('productInfo')})
+}
+
+Bookmark.invokeCreate = function(productId) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_CREATE,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({pathParameters: {id: productId}})
+  }).promise()
+}
+
+Bookmark.invokeDelete = function(productId) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_DELETE,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({pathParameters: {id: productId}})
+  }).promise()
+}
+
+Bookmark.prototype.invokeDelete = function() {
+  return Bookmark.invokeDelete(this.get('productId'))
 }
 
 module.exports.Bookmark = Bookmark

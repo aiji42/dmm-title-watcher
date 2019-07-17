@@ -1,0 +1,158 @@
+[
+  {
+    "type": "interactive_message",
+    "actions": [
+      {
+        "name": "create",
+        "type": "button",
+        "value": "ssni00528"
+      }
+    ],
+    "callback_id": "bookmark",
+    "team": {
+      "id": "****",
+      "domain": "****"
+    },
+    "channel": {
+      "id": "****",
+      "name": "****"
+    },
+    "user": {
+      "id": "****",
+      "name": "****"
+    },
+    "action_ts": "*********",
+    "message_ts": "**********",
+    "attachment_id": "1",
+    "token": "****",
+    "is_app_unfurl": false,
+    "original_message": {
+      "type": "message",
+      "subtype": "bot_message",
+      "text": "条件にマッチする新着タイトルが見つかりました。",
+      "ts": "**********",
+      "username": "新着お知らせ",
+      "icons": {
+        "emoji": ":new:",
+        "image_64": "https://a.slack-edge.com/37d58/img/emoji_2017_12_06/apple/1f195.png"
+      },
+      "bot_id": "****",
+      "attachments": [
+        {
+          "fallback": "error",
+          "image_url": "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528pl.jpg",
+          "image_width": 800,
+          "image_height": 538,
+          "image_bytes": 135403,
+          "callback_id": "bookmark",
+          "text": "2019-07-13発売",
+          "title": "新人NO.1STYLE 芸能人ひなたまりん",
+          "id": 1,
+          "title_link": "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=ssni00528/",
+          "fields": [
+            {
+              "title": "ジャンル",
+              "value": "ギリモザ デビュー作品 アイドル・芸能人 スレンダー 巨乳 単体作品 独占配信 ハイビジョン",
+              "short": false
+            },
+            {
+              "title": "出演",
+              "value": "<https://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=1053543/sort=date/|ひなたまりん>[<http://localhost:3001/subscriptions/actress/1053543/subscribe|購読>]",
+              "short": true
+            }
+          ],
+          "actions": [
+            {
+              "id": "1",
+              "name": "create",
+              "text": "ブックマーク",
+              "type": "button",
+              "value": "ssni00528",
+              "style": "primary"
+            }
+          ]
+        }
+      ]
+    },
+    "response_url": "https://hooks.slack.com/actions/*****/**/*******",
+    "trigger_id": "**************"
+  },
+  {
+    "type": "interactive_message",
+    "actions": [
+      {
+        "name": "delete",
+        "type": "button",
+        "value": "ssni00528"
+      }
+    ],
+    "callback_id": "bookmark",
+    "team": {
+      "id": "****",
+      "domain": "****"
+    },
+    "channel": {
+      "id": "****",
+      "name": "****"
+    },
+    "user": {
+      "id": "****",
+      "name": "****"
+    },
+    "action_ts": "*********",
+    "message_ts": "**********",
+    "attachment_id": "1",
+    "token": "****",
+    "is_app_unfurl": false,
+    "original_message": {
+      "type": "message",
+      "subtype": "bot_message",
+      "text": "条件にマッチする新着タイトルが見つかりました。",
+      "ts": "**********",
+      "username": "新着お知らせ",
+      "icons": {
+        "emoji": ":new:",
+        "image_64": "https://a.slack-edge.com/37d58/img/emoji_2017_12_06/apple/1f195.png"
+      },
+      "bot_id": "****",
+      "attachments": [
+        {
+          "fallback": "error",
+          "image_url": "https://pics.dmm.co.jp/digital/video/ssni00528/ssni00528pl.jpg",
+          "image_width": 800,
+          "image_height": 538,
+          "image_bytes": 135403,
+          "callback_id": "bookmark",
+          "text": "2019-07-13発売",
+          "title": "新人NO.1STYLE 芸能人ひなたまりん",
+          "id": 1,
+          "title_link": "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=ssni00528/",
+          "fields": [
+            {
+              "title": "ジャンル",
+              "value": "ギリモザ デビュー作品 アイドル・芸能人 スレンダー 巨乳 単体作品 独占配信 ハイビジョン",
+              "short": false
+            },
+            {
+              "title": "出演",
+              "value": "<https://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=1053543/sort=date/|ひなたまりん>[<http://localhost:3001/subscriptions/actress/1053543/subscribe|購読>]",
+              "short": true
+            }
+          ],
+          "actions": [
+            {
+              "id": "1",
+              "name": "create",
+              "text": "ブックマーク",
+              "type": "button",
+              "value": "ssni00528",
+              "style": "primary"
+            }
+          ]
+        }
+      ]
+    },
+    "response_url": "https://hooks.slack.com/actions/*****/**/*******",
+    "trigger_id": "**************"
+  }
+]

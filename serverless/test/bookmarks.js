@@ -1,7 +1,5 @@
 'use strict'
 
-process.on('unhandledRejection', console.dir)
-
 const mochaPlugin = require('serverless-mocha-plugin')
 const expect = mochaPlugin.chai.expect
 const initialProducts = require('./initials/product.json')

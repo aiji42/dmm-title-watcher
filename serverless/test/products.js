@@ -2,6 +2,7 @@
 
 const mochaPlugin = require('serverless-mocha-plugin')
 const expect = mochaPlugin.chai.expect
+const marshaler = require('dynamodb-marshaler')
 const { Subscription } = require('../model/subscription')
 const { Product } = require('../model/product')
 const { Torrent } = require('../model/torrent')
@@ -74,6 +75,19 @@ describe('Products', () => {
     it('Regular request succeed', () => {
       return wrapped.run({}).then(response => expect(response).to.be.equal('Sucessfully search by all subscriptions'))
     })
+  })
+
+  describe('Notify', () => {
+    const wrapped = mochaPlugin.getWrapper('productsNotify', '/products.js', 'notify')
+    const stream = {
+      Records: [
+        { eventName: 'INSERT', dynamodb: { NewImage: marshaler.marshalItem(initialProduct) } }
+      ]
+    }
+    it('Regular request succeed', () => {
+      return wrapped.run(stream).then(response => expect(response).to.be.equal('Sucessfully product notify slack'))
+    })
+
   })
 
   describe('RemindNotify', () => {

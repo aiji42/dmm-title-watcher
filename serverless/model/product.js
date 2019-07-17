@@ -7,7 +7,7 @@ const slack = new WebClient(process.env.SLACK_TOKEN)
 const channel = process.env.SLACK_CHANNEL_ID
 const { si } = require('nyaapi')
 
-Product.prototype.notifySlack = function() {
+Product.prototype.slackMessage = function(isBookmarked = false) {
   const actresses = this.actresses().map(actress => `<${actressDMMLink(actress)}|${actress.name}>[<${actionsSubscribeLink(actress)}|購読>]`)
   const genres = this.genres().map(genre => genre.name)
 
@@ -22,36 +22,48 @@ Product.prototype.notifySlack = function() {
     fields.push(field)
   }
 
-  const message = {
-    channel: channel,
-    username: '新着お知らせ',
-    icon_emoji: ':new:',
+  const action = {
+    type: 'button',
+    name: 'create',
+    text: 'ブックマーク',
+    value: this.get('id'),
+    style: 'primary'
+  }
+
+  if (isBookmarked) {
+    action.name = 'delete'
+    action.text = 'ブックマーク解除'
+    action.style = 'danger'
+    action.confirm = {
+      title: 'ブックマークを解除しますか？',
+      text: 'こちらは発売日にリマインドされます。ブックマークを解除しますか？',
+      ok_text: 'Yes',
+      dismiss_text: 'No'
+    }
+  }
+
+  return {
+    text: '条件にマッチする新着タイトルが見つかりました。',
     attachments: [
       {
-        fallback: '条件にマッチする新着タイトルが見つかりました。',
+        fallback: 'error',
         title: this.title(),
         title_link: this.dmmLink(),
         text: `${this.saleStartDate()}発売`,
         fields: fields,
         image_url: this.imageURL().large,
-        actions: [
-          {
-            type: 'button',
-            name: 'bookmark',
-            text: 'ブックマーク',
-            style: 'danger',
-            url: this.bookmarkLink(),
-            confirm: {
-              title: 'ブックマークしますか?',
-              text: '発売日にリマインドされます。',
-              ok_text: 'Yes',
-              dismiss_text: 'No'
-            }
-          }
-        ]
+        callback_id: 'bookmark',
+        actions: [ action ]
       }
     ]
   }
+}
+
+Product.prototype.notifySlack = function() {
+  const message = this.slackMessage()
+  message.channel = channel
+  message.username = '新着お知らせ'
+  message.icon_emoji = ':new:'
 
   return slack.chat.postMessage(message)
 }

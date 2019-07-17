@@ -14,7 +14,8 @@
     "dmm.js": "^0.1.0",
     "dynamodb": "^1.2.0",
     "dynamodb-marshaler": "^2.0.0",
-    "nyaapi": "^2.0.7"
+    "nyaapi": "^2.0.7",
+    "querystring": "^0.2.0"
   },
   "devDependencies": {
     "aws-sdk": "^2.493.0",

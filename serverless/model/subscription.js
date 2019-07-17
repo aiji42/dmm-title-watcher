@@ -5,6 +5,9 @@ const util = require('util')
 const { Subscription } = require('./table-schema')
 const { Product } = require('./product')
 const { DMMClient } = require('../util/dmm-client')
+const lambdaConfig = {}
+if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
+const lambda = new AWS.Lambda(lambdaConfig)
 
 Subscription.prototype.getProductsByAPI = function() {
   return new Promise((resolve, reject) => {
@@ -47,9 +50,6 @@ Subscription.prototype.isMatchedExcept = function(product) {
 }
 
 Subscription.prototype.invokeProductsSearch = function() {
-  const lambdaConfig = {}
-  if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
-  const lambda = new AWS.Lambda(lambdaConfig)
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH,
     InvocationType: 'Event',

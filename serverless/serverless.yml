@@ -22,6 +22,8 @@ provider:
       ${self:service}-${self:provider.stage}-productsRemindNotify
     LAMBDA_NAME_PRODUCTS_SEARCH_TORRENT_AND_NOTIFY:
       ${self:service}-${self:provider.stage}-productsSearchTorrentAndNotify
+    LAMBDA_NAME_BOOKMARKS_CREATE: ${self:service}-${self:provider.stage}-bookmarksCreate
+    LAMBDA_NAME_BOOKMARKS_DELETE: ${self:service}-${self:provider.stage}-bookmarksDelete
     BUCKET_TRANSMISSION_PROJECT: ${env:BUCKET_TRANSMISSION_PROJECT}
   iamRoleStatements:
     - Effect: Allow
@@ -174,6 +176,12 @@ functions:
       - http:
           path: /products/{id}/torrents/{torrentId}/download
           method: get
+  slackActionEndpoint:
+    handler: slack.actionEndpoint
+    events:
+      - http:
+          path: /slack/action-endpoint
+          method: post
 
 resources:
   Resources:
