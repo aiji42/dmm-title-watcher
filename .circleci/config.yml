@@ -42,6 +42,8 @@ workflows:
       - build
       - slack/approval-notification:
           message: デプロイを承認してください
+          requires:
+            - build
       - deploy:
           requires:
             - slack/approval-notification
