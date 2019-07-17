@@ -35,11 +35,19 @@ describe('Slack', () => {
         expect(response.body).to.include('"name":"create"')
       })
     })
-    it('Regular request (subscribe actress) returns status code 200', () => {
-      console.log(initialSlack[2])
+    it('Regular request (subscription actress) returns status code 200', () => {
       return wrapped.run({body: `payload=${JSON.stringify(initialSlack[2])}`}).then(response => {
         expect(response.statusCode).to.be.equal(200)
         expect(response.body).to.include('Sucessfully subscribe')
+      })
+    })
+    it('Regular request (subscription delete) returns status code 200', () => {
+      return Subscription.asyncAll(['id']).then(data => {
+        initialSlack[3].actions[0].value = data.Items[0].get('id')
+        return wrapped.run({body: `payload=${JSON.stringify(initialSlack[3])}`}).then(response => {
+          expect(response.statusCode).to.be.equal(200)
+          expect(response.body).to.include('Sucessfully deleted subscription')
+        })
       })
     })
   })
@@ -49,7 +57,7 @@ describe('Slack', () => {
     it('Regular request (/subscriptions) returns status code 200', () => {
       return wrapped.run({body: 'command=/subscriptions'}).then(response => {
         expect(response.statusCode).to.be.equal(200)
-        expect(response.body).to.include('name')
+        expect(response.body).to.include('title')
       })
     })
     it('Regular request (/actress) returns status code 200', () => {

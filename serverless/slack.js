@@ -18,9 +18,8 @@ module.exports.actionEndpoint = (event, context, callback) => {
         body: JSON.stringify(msg)
       })
     })
-  } else if (data.callback_id == 'subscribe') {
-    subscribe(data).then(msg => {
-      console.log(msg)
+  } else if (data.callback_id == 'subscription') {
+    subscription(data).then(msg => {
       callback(null, {
         statusCode: 200,
         body: JSON.stringify(msg)
@@ -48,7 +47,7 @@ module.exports.command = (event, context, callback) => {
     actress(text).then(msg => {
       callback(null, {
         statusCode: 200,
-        body: JSON.stringify({msg})
+        body: JSON.stringify(msg)
       })
     })
   } else {
@@ -71,10 +70,17 @@ const bookmark = async (data) => {
   return product.slackMessage(isBookmarked)
 }
 
-const subscribe = async (data) => {
+const subscription = async (data) => {
   if (data.actions[0].name == 'actress') {
     const res = await lambda.invoke({
       FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS,
+      InvocationType: 'RequestResponse',
+      Payload: JSON.stringify({pathParameters: {id: data.actions[0].value}})
+    }).promise()
+    return JSON.parse(res.Payload).body
+  } else if (data.actions[0].name == 'delete') {
+    const res = await lambda.invoke({
+      FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_DELETE,
       InvocationType: 'RequestResponse',
       Payload: JSON.stringify({pathParameters: {id: data.actions[0].value}})
     }).promise()
@@ -88,7 +94,28 @@ const subscriptions = async () => {
     InvocationType: 'RequestResponse',
     Payload: ''
   }).promise()
-  return JSON.parse(res.Payload).body
+  const subscriptions = JSON.parse(JSON.parse(res.Payload).body)
+  const attachments = subscriptions.map(subscription => {
+    return {
+      title: subscription.name,
+      callback_id: 'subscription',
+      actions: [
+        {
+          type: 'button',
+          name: 'delete',
+          text: '解除する',
+          value: subscription.id,
+          style: 'danger',
+          confirm: {
+            title: '購読を解除しますか？',
+            ok_text: 'Yes',
+            dismiss_text: 'No'
+          }
+        }
+      ]
+    }
+  })
+  return {text: '購読一覧', attachments: attachments}
 }
 
 const actress = async (text) => {
@@ -97,14 +124,20 @@ const actress = async (text) => {
     const attachment = {
       title: actress.name,
       title_link: actress.listURL.digital,
-      callback_id: 'subscribe',
+      callback_id: 'subscription',
       actions: [
         {
           type: 'button',
           name: 'actress',
           text: '購読する',
           value: actress.id,
-          style: 'primary'
+          style: 'primary',
+          confirm: {
+            title: '購読しますか？',
+            text: actress.name,
+            ok_text: 'Yes',
+            dismiss_text: 'No'
+          }
         }
       ]
     }

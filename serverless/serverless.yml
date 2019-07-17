@@ -18,6 +18,7 @@ provider:
     TABLE_TORRENTS: ${self:custom.table.torrents}
     GW_URL: ${self:custom.gw-url.${self:provider.stage}}
     LAMBDA_NAME_SUBSCRIPTIONS_INDEX: ${self:service}-${self:provider.stage}-subscriptionsIndex
+    LAMBDA_NAME_SUBSCRIPTIONS_DELETE: ${self:service}-${self:provider.stage}-subscriptionsDelete
     LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS:
       ${self:service}-${self:provider.stage}-subscriptionsSubscribeActerss
     LAMBDA_NAME_PRODUCTS_SEARCH: ${self:service}-${self:provider.stage}-productsSearch
