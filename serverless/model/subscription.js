@@ -65,7 +65,7 @@ Subscription.invokeIndex = function(options) {
 
 Subscription.invokeDelete = function(id, options = {}) {
   return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_INDEX,
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_DELETE,
     InvocationType: 'Event',
     Payload: JSON.stringify({pathParameters: {id: id}, ...options})
   }).promise()

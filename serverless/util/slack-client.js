@@ -48,7 +48,7 @@ const makeAttachmentSubscription = (subscription) => {
 const makeAttachmentActress = (actress) => {
   const attachment = {
     title: actress.name,
-    title_link: actress.listURL.digital,
+    title_link: actressDMMLink(actress),
     callback_id: 'subscription',
     actions: [
       {
@@ -71,7 +71,7 @@ const makeAttachmentActress = (actress) => {
 }
 
 const makeAttachmentProduct = async (product) => {
-  const actresses = product.actresses().map(actress => `<${actressDMMLink(actress)}|${actress.name}>[<${actionsSubscribeLink(actress)}|購読>]`)
+  const actresses = product.actresses().map(actress => `<${actressDMMLink(actress)}|${actress.name}>`)
   const genres = product.genres().map(genre => genre.name)
   const fields = []
   fields.push({title: 'ジャンル', value: genres.join(' ')})
@@ -180,11 +180,6 @@ const postProductWithTorrents = async (product, torrents) => {
 const actressDMMLink = actress => {
   return `https://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=${actress.id}/sort=date/`
 }
-
-const actionsSubscribeLink = actress => {
-  return `${process.env.GW_URL}/subscriptions/actress/${actress.id}/subscribe`
-}
-
 
 module.exports.SlackClient = {
   post: post,
