@@ -9,7 +9,7 @@ module.exports.search = async (event) => {
   try {
     const subscription = await Subscription.asyncGet(event.id)
     const products = await subscription.getProductsByAPI()
-    await Promise.all(products.map(product => Product.asyncCreate({id: product.get('id'), info: product.get('save')})))
+    await Promise.all(products.map(product => Product.asyncCreate({id: product.get('id'), info: product.get('info')})))
     return {statusCode: 200, body: 'Sucessfully search products'}
   } catch (err) {
     return {statusCode: 500, body: err.message}
