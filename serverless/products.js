@@ -23,10 +23,15 @@ module.exports.searchAll = async (event) => {
 }
 
 module.exports.notify = async (event) => {
-  const records = event.Records.filter(record => record.eventName == 'INSERT')
-  const products = records.map(record => new Product(unmarshalItem(record.dynamodb.NewImage)))
-  await Promise.all(products.map(product => SlackClient.postProduct('新着タイトルが見つかりました。', product)))
-  return {statusCode: 200, body: 'Sucessfully product notify slack'}
+  try {
+    const records = event.Records.filter(record => record.eventName == 'INSERT')
+    console.log(records)
+    const products = records.map(record => new Product(unmarshalItem(record.dynamodb.NewImage)))
+    await Promise.all(products.map(product => SlackClient.postProduct('新着タイトルが見つかりました。', product)))
+    return {statusCode: 200, body: 'Sucessfully product notify slack'}
+  } catch (err) {
+    return {statusCode: 500, body: err.message}
+  }
 }
 
 module.exports.remindNotify = async (event) => {
