@@ -17,7 +17,7 @@ module.exports.create = async (event) => {
 
   if (event.slack) await SlackClient.post(`購読条件: ${subscription.get('name')}を作製しました。`)
 
-  subscription.invokeProductsSearch({slack: event.slack})
+  await subscription.invokeProductsSearch({slack: event.slack})
 
   return {statusCode: 200, body: `Sucessfully created subscription '${subscription.get('name')}'`}
 }
