@@ -17,6 +17,7 @@ provider:
     TABLE_BOOKMARKS: ${self:custom.table.bookmarks}
     TABLE_TORRENTS: ${self:custom.table.torrents}
     GW_URL: ${self:custom.gw-url.${self:provider.stage}}
+    LAMBDA_NAME_SUBSCRIPTIONS_CREATE: ${self:service}-${self:provider.stage}-subscriptionsCreate
     LAMBDA_NAME_SUBSCRIPTIONS_INDEX: ${self:service}-${self:provider.stage}-subscriptionsIndex
     LAMBDA_NAME_SUBSCRIPTIONS_DELETE: ${self:service}-${self:provider.stage}-subscriptionsDelete
     LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS:
@@ -123,22 +124,10 @@ functions:
       - http:
           path: subscriptions/{id}
           method: delete
-
   productsSearch:
     handler: products.search
-    events:
-      - http:
-          path: subscriptions/{id}/products/search
-          method: post
-      - stream:
-          type: dynamodb
-          arn:
-            Fn::GetAtt:
-              - SubscriptionsTable
-              - StreamArn
   productsSearchAll:
     handler: products.searchAll
-    timeout: 60
     events:
       - schedule: cron(45 23 * * ? *) # JST 8:45 AM
   productsNotify:
@@ -223,8 +212,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        StreamSpecification:
-          StreamViewType: KEYS_ONLY
     BookmarksTable:
       Type: AWS::DynamoDB::Table
       Properties:

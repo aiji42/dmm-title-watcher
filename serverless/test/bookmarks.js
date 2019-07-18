@@ -1,5 +1,7 @@
 'use strict'
 
+process.on('unhandledRejection', console.dir);
+
 const mochaPlugin = require('serverless-mocha-plugin')
 const expect = mochaPlugin.chai.expect
 const initialProducts = require('./initials/product.json')
@@ -40,14 +42,14 @@ describe('Bookmarks', () => {
   describe('Remind', () => {
     const wrapped = mochaPlugin.getWrapper('bookmarksRemind', '/bookmarks.js', 'remind')
     it('Succeed remind', () => {
-      return wrapped.run({}).then(response => expect(response).to.be.equal('Sucessfully reminded bookmark'))
+      return wrapped.run({}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 
   describe('SearchAllTorrentable', () => {
     const wrapped = mochaPlugin.getWrapper('bookmarksSearchAllTorrentable', '/bookmarks.js', 'searchAllTorrentable')
     it('Succeed search all torrentable', () => {
-      return wrapped.run({}).then(response => expect(response).to.be.equal('Sucessfully search all torrentable bookmark'))
+      return wrapped.run({}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 

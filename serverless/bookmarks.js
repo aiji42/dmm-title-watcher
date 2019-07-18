@@ -2,91 +2,46 @@
 
 const { Product } = require('./model/product')
 const { Bookmark } = require('./model/bookmark')
+const { SlackClient } = require('./util/slack-client')
 
-module.exports.create = (event, context, callback) => {
-  Product.asyncGet(event.pathParameters.id)
-  .then(product => {
-    if (! product) throw 'Not found product'
-    return Bookmark.asyncCreate({
-      productId: product.get('id'),
-      saleStartDate: product.get('info').date,
-      productInfo: product.get('info')
-    })
+module.exports.create = async (event) => {
+  const product = await Product.asyncGet(event.pathParameters.id)
+  if (! product) return {statusCode: 404, body: 'Not found product'}
+  await Bookmark.asyncCreate({
+    productId: product.get('id'),
+    saleStartDate: product.get('info').date,
+    productInfo: product.get('info')
   })
-  .then(bookmark => {
-    callback(null, {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: `Successfully create bookmark productId: ${event.pathParameters.id}`
-      })
-    })
-  })
-  .catch(err => {
-    if (err = 'Not found product') {
-      callback(null, {
-        statusCode: 404,
-        body: JSON.stringify({
-          message: `Not found product id: ${event.pathParameters.id}`
-        })
-      })
-    } else {
-      console.error(err)
-      callback(null, {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: `Unable to create bookmark productId: ${event.pathParameters.id}`
-        })
-      })
-    }
-  })
+
+  if (event.slack) {
+    if (event.responseURL) await SlackClient.replaceProduct(event.responseURL, 'ブックマークしました。', product)
+    else await SlackClient.postProduct('ブックマークしました。', product)
+  }
+
+  return {statusCode: 200, body: `Successfully create bookmark productId: ${event.pathParameters.id}`}
 }
 
-module.exports.delete = (event, context, callback) => {
-  Bookmark.asyncDestroy(event.pathParameters.id, {ReturnValues: 'ALL_OLD'})
-  .then(bookmark => {
-    if (! bookmark) {
-      callback(null, {
-        statusCode: 404,
-        body: JSON.stringify({
-          message: 'Not found bookmark id: ${event.pathParameters.id}'
-        })
-      })
-    } else {
-      callback(null, {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: 'Sucessfully deleted bookmark'
-        })
-      })
-    }
-  })
-  .catch(err => {
-    console.error(err)
-    callback(null, {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: `Unable to delete bookmark productId: ${event.pathParameters.id}`
-      })
-    })
-  })
+module.exports.delete = async (event) => {
+  const bookmark = await Bookmark.asyncDestroy(event.pathParameters.id, {ReturnValues: 'ALL_OLD'})
+  if (! bookmark) return {statusCode: 404, body: `Not found bookmark id: ${event.pathParameters.id}`}
+
+  if (event.slack) {
+    const product = await Product.get(bookmark.get('productId'))
+    if (event.responseURL) await SlackClient.replaceProduct(event.responseURL, 'ブックマークを解除しました。', product)
+    else await SlackClient.postProduct('ブックマークを解除しました。', product)
+  }
+
+  return {statusCode: 200, body: `Sucessfully deleted bookmark id: ${event.pathParameters.id}`}
 }
 
-module.exports.remind = (event, context, callback) => {
-  Bookmark.scanRemindable()
-  .then(data => Promise.all(data.Items.map(bookmark => bookmark.invokeRemindNotify())))
-  .then(() => callback(null, 'Sucessfully reminded bookmark'))
-  .catch(err => {
-    console.error(err)
-    callback(null, 'Unable to remind bookmark')
-  })
+module.exports.remind = async (event) => {
+  const bookmarks = (await Bookmark.scanRemindable()).Items
+  await Promise.all(bookmarks.map(bookmark => bookmark.invokeRemindNotify({slack: true})))
+  return {statusCode: 200}
 }
 
-module.exports.searchAllTorrentable = (event, context, callback) => {
-  Bookmark.scanTorrentable()
-  .then(data => Promise.all(data.Items.map(bookmark => bookmark.invokeSearchTorrentAndNotify())))
-  .then(() => callback(null, 'Sucessfully search all torrentable bookmark'))
-  .catch(err => {
-    console.error(err)
-    callback(null, 'Unable to search all torrentable bookmark')
-  })
+module.exports.searchAllTorrentable = async (event) => {
+  const bookmarks = (await Bookmark.scanTorrentable()).Items
+  await Promise.all(bookmarks.map(bookmark => bookmark.invokeSearchTorrentAndNotify({slack: true})))
+  return {statusCode: 200}
 }

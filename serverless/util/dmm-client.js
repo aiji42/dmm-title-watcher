@@ -10,4 +10,10 @@ const client = new DMM.Client({
 client.asyncProduct = util.promisify(client.product)
 client.asyncActress = util.promisify(client.actress)
 
+client.findActress = async (id) => {
+  const data = await client.asyncActress({actress_id: id})
+  if (data.result.result_count < 1) throw 'Not Found actress'
+  return data.result.actress[0]
+}
+
 module.exports.DMMClient = client

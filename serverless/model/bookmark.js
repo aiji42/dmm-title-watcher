@@ -33,44 +33,44 @@ Bookmark.scanTorrentable = function() {
   })
 }
 
-Bookmark.prototype.invokRemindNotify = function() {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_PRODUCTS_REMIND_NOTIFY,
-    InvocationType: 'Event',
-    Payload: JSON.stringify({productId: this.get('productId')})
-  }).promise()
-}
-
-Bookmark.prototype.invokeSearchTorrentAndNotify = function() {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH_TORRENT_AND_NOTIFY,
-    InvocationType: 'Event',
-    Payload: JSON.stringify({productId: this.get('productId')})
-  }).promise()
-}
-
 Bookmark.prototype.getProduct = function() {
   return new Product({id: this.get('productId'), info: this.get('productInfo')})
 }
 
-Bookmark.invokeCreate = function(productId) {
+Bookmark.invokeCreate = function(productId, options = {}) {
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_CREATE,
     InvocationType: 'Event',
-    Payload: JSON.stringify({pathParameters: {id: productId}})
+    Payload: JSON.stringify({pathParameters: {id: productId}, ...options})
   }).promise()
 }
 
-Bookmark.invokeDelete = function(productId) {
+Bookmark.invokeDelete = function(productId, options = {}) {
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_DELETE,
     InvocationType: 'Event',
-    Payload: JSON.stringify({pathParameters: {id: productId}})
+    Payload: JSON.stringify({pathParameters: {id: productId}, ...options})
   }).promise()
 }
 
 Bookmark.prototype.invokeDelete = function() {
   return Bookmark.invokeDelete(this.get('productId'))
+}
+
+Bookmark.prototype.invokRemindNotify = function(options = {}) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_PRODUCTS_REMIND_NOTIFY,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({productId: this.get('productId'), ...options})
+  }).promise()
+}
+
+Bookmark.prototype.invokeSearchTorrentAndNotify = function(options = {}) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH_TORRENT_AND_NOTIFY,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({productId: this.get('productId'), ...options})
+  }).promise()
 }
 
 module.exports.Bookmark = Bookmark

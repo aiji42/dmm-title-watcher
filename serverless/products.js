@@ -2,94 +2,49 @@
 
 const { Subscription } = require('./model/subscription')
 const { Product } = require('./model/product')
+const { SlackClient } = require('./util/slack-client')
 const unmarshalItem = require('dynamodb-marshaler').unmarshalItem
 
-module.exports.search = (event, context, callback) => {
-  const ids = []
-  if (event.httpMethod == 'POST') {
-    ids.push(event.pathParameters.id)
-  } else if ('Records' in event) {
-    const tmpIds = event.Records.filter(record => record.eventName == 'INSERT').map(record => record.dynamodb.Keys.id.S)
-    Array.prototype.push.apply(ids, tmpIds)
+module.exports.search = async (event) => {
+  try {
+    const subscription = await Subscription.asyncGet(event.id)
+    const products = await subscription.getProductsByAPI()
+    await Promise.all(products.map(product => Product.asyncCreate({id: product.get('id'), info: product.get('save')})))
+    return {statusCode: 200, body: 'Sucessfully search products'}
+  } catch (err) {
+    return {statusCode: 500, body: err.message}
   }
-  if (ids.length < 1) {
-    callback(null, 'Do not need to search products')
-    return
-  }
-
-  Subscription.asyncGetItems(ids)
-  .then(subscriptions => {
-    if (subscriptions.length < 1) throw 'Not found subscription'
-    const getProducts = subscriptions.map(subscription => subscription.getProductsByAPI())
-    return Promise.all(getProducts).then(products => products[0].forEach(product => product.save()))
-  })
-  .then(() => {
-    callback(null, {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: `Sucessfully search products ids: ${ids.join(', ')}`
-      })
-    })
-  })
-  .catch((err) => {
-    if (err == 'Not found subscription') {
-      callback(null, {
-        statusCode: 404,
-        body: JSON.stringify({
-          message: `Not found subscription ids: ${ids.join(', ')}`
-        })
-      })
-    } else {
-      console.error(err)
-      callback(null, {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: `Unable to search products ids: ${ids.join(', ')}`
-        })
-      })
-    }
-  })
 }
 
-module.exports.searchAll = (event, context, callback) => {
-  Subscription.getActiveItems()
-  .then(subscriptions => {
-    const pros = subscriptions.map(subscription => subscription.invokeProductsSearch())
-    return Promise.all(pros)
-  })
-  .then(() => callback(null, 'Sucessfully search by all subscriptions'))
-  .catch(err => {
-    console.error(err)
-    callback(null, 'Unable to search by all subscriptions')
-  })
+module.exports.searchAll = async (event) => {
+  const subscriptions = await Subscription.getActiveItems()
+  await Promise.all(subscriptions.map(subscription => subscription.invokeProductsSearch()))
+  return {statusCode: 200, body: 'Sucessfully search by all subscriptions'}
 }
 
-module.exports.notify = (event, context, callback) => {
+module.exports.notify = async (event) => {
   const records = event.Records.filter(record => record.eventName == 'INSERT')
-  Promise.all(records.map(record => new Product(unmarshalItem(record.dynamodb.NewImage)).notifySlack()))
-  .then(() => callback(null, 'Sucessfully product notify slack'))
-  .catch(err => {
-    console.log(err)
-    callback(null, 'Unable to product notify slack')
-  })
+  const products = records.map(record => new Product(unmarshalItem(record.dynamodb.NewImage)))
+  await Promise.all(products.map(product => SlackClient.postProduct('新着タイトルが見つかりました。', product)))
+  return {statusCode: 200, body: 'Sucessfully product notify slack'}
 }
 
-module.exports.remindNotify = (event, context, callback) => {
-  Product.asyncGet(event.productId)
-  .then(product => product.remindNotifySlack())
-  .then(() => callback(null, 'Sucessfully product remind notify slack'))
-  .catch(err => {
-    console.log(err)
-    callback(null, 'Unable to product remind notify slack')
-  })
+module.exports.remindNotify = async (event) => {
+  const product = await Product.asyncGet(event.productId)
+  if (event.slack) await SlackClient.postProduct('【リマインド】本日発売日です。', product)
+  return {statusCode: 200, body: 'Sucessfully product remind notify'}
 }
 
-module.exports.searchTorrentAndNotify = (event, context, callback) => {
-  Product.asyncGet(event.productId)
-  .then(product => product.notifySlackWithTorrent())
-  .then(() => callback(null, 'Sucessfully product search torrent and notify slack'))
-  .catch(err => {
-    console.log(err)
-    callback(null, 'Unable to product notify slack')
-  })
+module.exports.searchTorrentAndNotify = async (event) => {
+  try {
+    const product = await Product.asyncGet(event.productId)
+    const torrentInfos = await product.searchTorrent()
+    if (torrentInfos.length > 0) {
+      const torrents = await Promise.all(torrentInfos.map(torrentInfo => product.createTorrent(torrentInfo)))
+      if (event.slack) await SlackClient.postTorrents(product, torrents)
+    }
+    return {statusCode: 200, body: 'Sucessfully product search torrent and notify'}
+  } catch (err) {
+    return {statusCode: 500, body: err.message}
+  }
 }

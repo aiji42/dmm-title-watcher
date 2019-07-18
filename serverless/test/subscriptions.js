@@ -7,7 +7,8 @@ const { Subscription } = require('../model/subscription')
 
 describe('Subscriptions', () => {
   const initialSubscription = initialSubscriptions[0]
-  let targetId = ''
+  let targetId1 = ''
+  let targetId2 = ''
   before(done => {
     (async () => {
       await Subscription.asyncCreateTable()
@@ -40,13 +41,28 @@ describe('Subscriptions', () => {
     })
   })
 
+  describe('SubscribeActress', () => {
+    const wrapped = mochaPlugin.getWrapper('subscriptionsSubscribeActress', '/subscriptions.js', 'subscribeActress')
+    it('Regular request returns status code 200', () => {
+      return wrapped.run({pathParameters: {id: '1025419'}}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+
+    it('Regular request with slack true returns status code 200', () => {
+      return wrapped.run({pathParameters: {id: '1025419'}, slack: true}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+  })
+
   describe('Index', () => {
     const wrapped = mochaPlugin.getWrapper('subscriptionsIndex', '/subscriptions.js', 'index')
     it('Regular request returns status code 200', () => {
       return wrapped.run({}).then(response => {
-        targetId = JSON.parse(response.body)[0].id
+        targetId1 = JSON.parse(response.body)[0].id
+        targetId2 = JSON.parse(response.body)[1].id
         expect(response.statusCode).to.be.equal(200)
       })
+    })
+    it('Regular request with slack true returns status code 200', () => {
+      return wrapped.run({slack: true}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 
@@ -57,7 +73,7 @@ describe('Subscriptions', () => {
     })
 
     it('Regular request returns status code 200', () => {
-      return wrapped.run({pathParameters: {id: targetId}}).then(response => expect(response.statusCode).to.be.equal(200))
+      return wrapped.run({pathParameters: {id: targetId1}}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 
@@ -68,18 +84,11 @@ describe('Subscriptions', () => {
     })
 
     it('Regular request returns status code 200', () => {
-      return wrapped.run({pathParameters: {id: targetId}}).then(response => expect(response.statusCode).to.be.equal(200))
-    })
-  })
-
-  describe('SubscribeActress', () => {
-    const wrapped = mochaPlugin.getWrapper('subscriptionsSubscribeActress', '/subscriptions.js', 'subscribeActress')
-    it('Not found actress returns status code 404', () => {
-      return wrapped.run({pathParameters: {id: '0'}}).then(response => expect(response.statusCode).to.be.equal(404))
+      return wrapped.run({pathParameters: {id: targetId1}}).then(response => expect(response.statusCode).to.be.equal(200))
     })
 
-    it('Regular request returns status code 200', () => {
-      return wrapped.run({pathParameters: {id: '1025419'}}).then(response => expect(response.statusCode).to.be.equal(200))
+    it('Regular request with slack true returns status code 200', () => {
+      return wrapped.run({pathParameters: {id: targetId2}, slack: true}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 

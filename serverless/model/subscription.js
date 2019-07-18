@@ -9,25 +9,15 @@ const lambdaConfig = {}
 if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
 const lambda = new AWS.Lambda(lambdaConfig)
 
-Subscription.prototype.getProductsByAPI = function() {
-  return new Promise((resolve, reject) => {
-    DMMClient.asyncProduct(this.preparedCondition())
-    .then(data => {
-      Subscription.asyncUpdate({id: this.get('id'), failedCount: 0})
-      .then(() => {
-        const products = []
-        data.result.items.forEach(product => {
-          if (this.isMatchedExcept(product)) return
-          products.push(new Product({id: product.product_id, info: product}))
-        })
-        resolve(products)
-      })
-    })
-    .catch(err => {
-      Subscription.asyncUpdate({id: this.get('id'), failedCount: this.get('failedCount') + 1})
-      .then(() => reject(err))
-    })
-  })
+Subscription.prototype.getProductsByAPI = async function() {
+  try {
+    const items = (await DMMClient.asyncProduct(this.preparedCondition())).result.items
+    await Subscription.asyncUpdate({id: this.get('id'), failedCount: 0})
+    return items.filter(item => ! this.isMatchedExcept(item)).map(item => new Product({id: item.product_id, info: item}))
+  } catch (err) {
+    await Subscription.asyncUpdate({id: this.get('id'), failedCount: this.get('failedCount') + 1})
+    throw err
+  }
 }
 
 Subscription.prototype.preparedCondition = function() {
@@ -49,11 +39,43 @@ Subscription.prototype.isMatchedExcept = function(product) {
   }).some(res => res)
 }
 
-Subscription.prototype.invokeProductsSearch = function() {
+Subscription.prototype.invokeProductsSearch = function(options = {}) {
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH,
     InvocationType: 'Event',
-    Payload: JSON.stringify({httpMethod: 'POST', pathParameters: {id: this.get('id')}})
+    Payload: JSON.stringify({id: this.get('id'), ...options})
+  }).promise()
+}
+
+Subscription.invokeCreate = function(data, options = {}) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_CREATE,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({body: JSON.stringify(data), ...options})
+  }).promise()
+}
+
+Subscription.invokeIndex = function(options) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_INDEX,
+    InvocationType: 'Event',
+    Payload: JSON.stringify(options)
+  }).promise()
+}
+
+Subscription.invokeDelete = function(id, options = {}) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_INDEX,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({pathParameters: {id: id}, ...options})
+  }).promise()
+}
+
+Subscription.invokeSubscribeActress = function(id, options = {}) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({pathParameters: {id: id}, ...options})
   }).promise()
 }
 

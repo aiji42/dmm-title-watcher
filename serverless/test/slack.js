@@ -24,46 +24,27 @@ describe('Slack', () => {
   describe('ActionEndpoint', () => {
     const wrapped = mochaPlugin.getWrapper('slackActionEndpoint', '/slack.js', 'actionEndpoint')
     it('Regular request (create bookmark) returns status code 200', () => {
-      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[0])}`}).then(response => {
-        expect(response.statusCode).to.be.equal(200)
-        expect(response.body).to.include('"name":"delete"')
-      })
+      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[0])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
     it('Regular request (delete bookmark) returns status code 200', () => {
-      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[1])}`}).then(response => {
-        expect(response.statusCode).to.be.equal(200)
-        expect(response.body).to.include('"name":"create"')
-      })
+      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[1])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
     it('Regular request (subscription actress) returns status code 200', () => {
-      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[2])}`}).then(response => {
-        expect(response.statusCode).to.be.equal(200)
-        expect(response.body).to.include('Sucessfully subscribe')
-      })
+      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[2])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
     it('Regular request (subscription delete) returns status code 200', () => {
-      return Subscription.asyncAll(['id']).then(data => {
-        initialSlack[3].actions[0].value = data.Items[0].get('id')
-        return wrapped.run({body: `payload=${JSON.stringify(initialSlack[3])}`}).then(response => {
-          expect(response.statusCode).to.be.equal(200)
-          expect(response.body).to.include('Sucessfully deleted subscription')
-        })
-      })
+      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[3])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 
   describe('Command', () => {
     const wrapped = mochaPlugin.getWrapper('slackCommand', '/slack.js', 'command')
     it('Regular request (/subscriptions) returns status code 200', () => {
-      return wrapped.run({body: 'command=/subscriptions'}).then(response => {
-        expect(response.statusCode).to.be.equal(200)
-        expect(response.body).to.include('title')
-      })
+      return wrapped.run({body: 'command=/subscriptions'}).then(response => expect(response.statusCode).to.be.equal(200))
     })
     it('Regular request (/actress) returns status code 200', () => {
       return wrapped.run({body: 'command=/actress&text=深田えいみ'}).then(response => {
         expect(response.statusCode).to.be.equal(200)
-        expect(response.body).to.include('title')
       })
     })
   })
