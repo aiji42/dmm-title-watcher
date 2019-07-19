@@ -1,28 +1,6 @@
 const { WebClient } = require('@slack/web-api')
 const slack = new WebClient(process.env.SLACK_TOKEN)
 const channel = process.env.SLACK_CHANNEL_ID
-const request = require('request')
-
-const post = async (text) => {
-  await slack.chat.postMessage({
-    channel: channel,
-    text: text
-  })
-}
-
-const replacePost = async (responseURL, message) => {
-  const options = {
-    uri: responseURL,
-    headers: {'Content-type': 'application/json'},
-    json: message
-  }
-  return new Promise((resolve, reject) => {
-    request.post(options, (err, response, body) => {
-      if (err) reject(err)
-      else resolve(body)
-    })
-  })
-}
 
 const makeAttachmentSubscription = (subscription) => {
   return {
@@ -103,18 +81,16 @@ const makeAttachmentProduct = async (product) => {
     }
   }
 
-  return [
-    {
-      fallback: 'error',
-      title: product.title(),
-      title_link: product.dmmLink(),
-      text: `${product.saleStartDate()}発売`,
-      fields: fields,
-      image_url: product.imageURL().large,
-      callback_id: 'bookmark',
-      actions: [ action ]
-    }
-  ]
+  return {
+    fallback: 'error',
+    title: product.title(),
+    title_link: product.dmmLink(),
+    text: `${product.saleStartDate()}発売`,
+    fields: fields,
+    image_url: product.imageURL().large,
+    callback_id: 'bookmark',
+    actions: [ action ]
+  }
 }
 
 const makeAttachmentTorrent = torrent => {
@@ -134,6 +110,13 @@ const makeAttachmentTorrent = torrent => {
   }
 }
 
+const post = async (text) => {
+  await slack.chat.postMessage({
+    channel: channel,
+    text: text
+  })
+}
+
 const postSubscriptions = async (subscriptions) => {
   await slack.chat.postMessage({
     channel: channel,
@@ -151,19 +134,21 @@ const postActresses = async (keyword, actresses) => {
 }
 
 const postProduct = async (text, product) => {
-  const attachments = await makeAttachmentProduct(product)
+  const attachment = await makeAttachmentProduct(product)
   await slack.chat.postMessage({
     channel: channel,
     text: text,
-    attachments: attachments
+    attachments: [attachment]
   })
 }
 
-const replaceProduct = async (responseURL, text, product) => {
-  const attachments = await makeAttachmentProduct(product)
-  await replacePost(responseURL, {
-    text: text,
-    attachments: attachments
+const postSubscriptionSearchProducts = async (subscription, products) => {
+  const attachments = [await makeAttachmentSubscription(subscription)]
+  const productAtts = await Promise.all(products.map(product => makeAttachmentProduct(product)))
+  await slack.chat.postMessage({
+    channel: channel,
+    text: `下記購読条件で ${products.length} 件のタイトルが新たに見つかりました。`,
+    attachments: attachments.concat(productAtts)
   })
 }
 
@@ -186,6 +171,6 @@ module.exports.SlackClient = {
   postSubscriptions: postSubscriptions,
   postActresses: postActresses,
   postProduct: postProduct,
-  replaceProduct: replaceProduct,
-  postProductWithTorrents: postProductWithTorrents
+  postProductWithTorrents: postProductWithTorrents,
+  postSubscriptionSearchProducts: postSubscriptionSearchProducts
 }

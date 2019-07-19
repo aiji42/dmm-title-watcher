@@ -9,10 +9,9 @@ Product.prototype.isBookmarked = async function() {
   return bookmark ? true : false
 }
 
-Product.asyncCreateAndNotifyIfNew = async function(productData) {
+Product.createOnlyNew = async function(productData) {
   try {
-    const product = await this.asyncCreate(productData, {overwrite: false})
-    await SlackClient.postProduct('新着タイトルが見つかりました。', product)
+    return await this.asyncCreate(productData, {overwrite: false})
   } catch (err) {
     if (err.code != 'ConditionalCheckFailedException') throw err
   }

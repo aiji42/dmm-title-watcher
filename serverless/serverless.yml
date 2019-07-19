@@ -17,12 +17,13 @@ provider:
     TABLE_BOOKMARKS: ${self:custom.table.bookmarks}
     TABLE_TORRENTS: ${self:custom.table.torrents}
     GW_URL: ${self:custom.gw-url.${self:provider.stage}}
-    LAMBDA_NAME_SUBSCRIPTIONS_CREATE: ${self:service}-${self:provider.stage}-subscriptionsCreate
     LAMBDA_NAME_SUBSCRIPTIONS_INDEX: ${self:service}-${self:provider.stage}-subscriptionsIndex
     LAMBDA_NAME_SUBSCRIPTIONS_DELETE: ${self:service}-${self:provider.stage}-subscriptionsDelete
     LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS:
       ${self:service}-${self:provider.stage}-subscriptionsSubscribeActerss
-    LAMBDA_NAME_SUBSCRIPTIONS_SEARCH: ${self:service}-${self:provider.stage}-subscriptionsSearch
+    LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_GENRE:
+      ${self:service}-${self:provider.stage}-subscriptionsSubscribeGenre
+    LAMBDA_NAME_SUBSCRIPTIONS_SEARCH_PRODUCTS: ${self:service}-${self:provider.stage}-subscriptionsSearchProducts
     LAMBDA_NAME_BOOKMARKS_CREATE: ${self:service}-${self:provider.stage}-bookmarksCreate
     LAMBDA_NAME_BOOKMARKS_DELETE: ${self:service}-${self:provider.stage}-bookmarksDelete
     LAMBDA_NAME_BOOKMARKS_SEARCH_TORRENT_AND_NOTIFY:
@@ -85,46 +86,18 @@ custom:
     skipCacheInvalidation: false
 
 functions:
-  subscriptionsCreate:
-    handler: subscriptions.create
-    events:
-      - http:
-          path: subscriptions
-          method: post
   subscriptionsSubscribeActerss:
     handler: subscriptions.subscribeActress
-    events:
-      - http:
-          path: subscriptions/actress/{id}/subscribe
-          method: post
+  subscriptionsSubscribeGenre:
+    handler: subscriptions.subscribeGenre
   subscriptionsIndex:
     handler: subscriptions.index
-    events:
-      - http:
-          path: subscriptions
-          method: get
-  subscriptionsShow:
-    handler: subscriptions.show
-    events:
-      - http:
-          path: subscriptions/{id}
-          method: get
-  # subscriptionsUpdate:
-  #   handler: subscriptions.update
-  #   events:
-  #     - http:
-  #         path: subscriptions/{id}
-  #         method: put
   subscriptionsDelete:
     handler: subscriptions.delete
-    events:
-      - http:
-          path: subscriptions/{id}
-          method: delete
-  subscriptionsSearch:
-    handler: subscriptions.search
-  subscriptionsSearchAll:
-    handler: subscriptions.searchAll
+  subscriptionsSearchProducts:
+    handler: subscriptions.searchProducts
+  subscriptionsBulkSearchProducts:
+    handler: subscriptions.bulkSearchProducts
     events:
       - schedule: cron(45 23 * * ? *) # JST 8:45 AM
   bookmarksCreate:

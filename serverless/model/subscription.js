@@ -1,7 +1,7 @@
 'use strict'
 
 const AWS = require('aws-sdk')
-const util = require('util')
+const { SlackClient } = require('../util/slack-client')
 const { Subscription } = require('./table-schema')
 const { Product } = require('./product')
 const { DMMClient } = require('../util/dmm-client')
@@ -9,15 +9,35 @@ const lambdaConfig = {}
 if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
 const lambda = new AWS.Lambda(lambdaConfig)
 
-Subscription.prototype.getProductsByAPI = async function() {
+Subscription.defaultCondition = {
+  site: "FANZA",
+  service: "digital",
+  floor: "videoa",
+  article: null,
+  article_id: null,
+  gte_date: "#TODAY",
+  hits: 100
+}
+
+Subscription.defaultExceptCondition = {
+  genre: [3036, 6793]
+}
+
+Subscription.prototype.searchProductsAndNotify = async function() {
+  const productDatas = await this.searchProducts()
+  let products = await Promise.all(productDatas.map(data => Product.createOnlyNew({id: data.product_id, info: data})))
+  products = products.filter(product => product)
+  if (products.length > 0) SlackClient.postSubscriptionSearchProducts(this, products)
+}
+
+Subscription.prototype.searchProducts = async function() {
   try {
     const items = (await DMMClient.asyncProduct(this.preparedCondition())).result.items
     await Subscription.asyncUpdate({id: this.get('id'), failedCount: 0})
-    return items.filter(item => ! this.isMatchedExcept(item)).map(item => new Product({id: item.product_id, info: item}))
+    return items.filter(item => ! this.isMatchedExcept(item))
   } catch (err) {
     await Subscription.asyncUpdate({id: this.get('id'), failedCount: this.get('failedCount') + 1})
-    if (err.message != 'API error: 400 unknown error') throw err
-    return []
+    throw err
   }
 }
 
@@ -40,66 +60,70 @@ Subscription.prototype.isMatchedExcept = function(product) {
   }).some(res => res)
 }
 
-Subscription.prototype.invokeSearch = function(options = {}) {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SEARCH,
-    InvocationType: 'Event',
-    Payload: JSON.stringify({id: this.get('id'), ...options})
-  }).promise()
-}
-
-Subscription.invokeCreate = function(data, options = {}) {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_CREATE,
-    InvocationType: 'Event',
-    Payload: JSON.stringify({body: JSON.stringify(data), ...options})
-  }).promise()
-}
-
-Subscription.invokeIndex = function(options) {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_INDEX,
-    InvocationType: 'Event',
-    Payload: JSON.stringify(options)
-  }).promise()
-}
-
-Subscription.invokeDelete = function(id, options = {}) {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_DELETE,
-    InvocationType: 'Event',
-    Payload: JSON.stringify({pathParameters: {id: id}, ...options})
-  }).promise()
-}
-
-Subscription.invokeSubscribeActress = function(id, options = {}) {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS,
-    InvocationType: 'Event',
-    Payload: JSON.stringify({pathParameters: {id: id}, ...options})
-  }).promise()
-}
-
 Subscription.getActiveItems = function() {
   return new Promise((resolve, reject) => {
     this.scan()
-        .where('failedCount').lte(9)
-        .exec((err, data) => {
-          if (err) reject(err)
-          else resolve(data.Items)
-        })
+    .where('failedCount').lte(9)
+    .exec((err, data) => {
+      if (err) reject(err)
+      else resolve(data.Items)
+    })
   })
 }
 
 Subscription.asyncAll = function(attributes) {
   return new Promise((resolve, reject) => {
     this.scan()
-        .attributes(attributes)
-        .exec((err, data) => {
-          if (err) reject(err)
-          else resolve(data)
-        })
+    .attributes(attributes)
+    .exec((err, data) => {
+      if (err) reject(err)
+      else resolve(data)
+    })
   })
+}
+
+Subscription.invokeIndex = function() {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_INDEX,
+    InvocationType: 'Event',
+    Payload: JSON.stringify()
+  }).promise()
+}
+
+Subscription.invokeDelete = function(id) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_DELETE,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({id: id})
+  }).promise()
+}
+
+Subscription.invokeSubscribeActress = function(id) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({id: id})
+  }).promise()
+}
+
+Subscription.invokeSubscribeGenre = function(keyword) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_GENRE,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({keyword: keyword})
+  }).promise()
+}
+
+Subscription.invokeSearchProducts = function(id) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SEARCH_PRODUCTS,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({id: id})
+  }).promise()
+}
+
+Subscription.prototype.invokeSearchProducts = function() {
+  return Subscription.invokeSearchProducts(this.get('id'))
 }
 
 module.exports.Subscription = Subscription

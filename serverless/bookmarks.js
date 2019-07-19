@@ -15,7 +15,7 @@ module.exports.create = async (event) => {
     })
 
     if (event.slack) {
-      if (event.responseURL) await SlackClient.replaceProduct(event.responseURL, 'ブックマークしました。', product)
+      if (event.responseURL) await SlackClient.postProduct('ブックマークしました。', product)
       else await SlackClient.postProduct('ブックマークしました。', product)
     }
 
@@ -33,7 +33,7 @@ module.exports.delete = async (event) => {
 
     if (event.slack) {
       const product = await Product.get(bookmark.get('productId'))
-      if (event.responseURL) await SlackClient.replaceProduct(event.responseURL, 'ブックマークを解除しました。', product)
+      if (event.responseURL) await SlackClient.postProduct('ブックマークを解除しました。', product)
       else await SlackClient.postProduct('ブックマークを解除しました。', product)
     }
 
