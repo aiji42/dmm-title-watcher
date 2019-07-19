@@ -61,7 +61,6 @@ package:
     - Dockerfile
 
 plugins:
-  - serverless-offline-dynamodb-streams
   - serverless-offline
   - serverless-mocha-plugin
 
@@ -130,15 +129,6 @@ functions:
     handler: products.searchAll
     events:
       - schedule: cron(45 23 * * ? *) # JST 8:45 AM
-  productsNotify:
-    handler: products.notify
-    events:
-      - stream:
-          type: dynamodb
-          arn:
-            Fn::GetAtt:
-              - ProductsTable
-              - StreamArn
   productsRemindNotify:
     handler: products.remindNotify
   productsSearchTorrentAndNotify:
@@ -197,8 +187,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        StreamSpecification:
-          StreamViewType: NEW_IMAGE
     SubscriptionsTable:
       Type: AWS::DynamoDB::Table
       Properties:

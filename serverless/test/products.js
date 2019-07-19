@@ -2,7 +2,6 @@
 
 const mochaPlugin = require('serverless-mocha-plugin')
 const expect = mochaPlugin.chai.expect
-const marshaler = require('dynamodb-marshaler')
 const { Subscription } = require('../model/subscription')
 const { Product } = require('../model/product')
 const { Bookmark } = require('../model/bookmark')
@@ -35,12 +34,16 @@ describe('Products', () => {
       return Subscription.asyncGet(subscriptionId).then(subscription => expect(subscription.get('failedCount')).to.be.equal(0))
     })
 
+    it('Regular request second time returns status code 200', () => {
+      return wrapped.run({id: subscriptionId}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+
     let invalidSubscriptionId = ''
-    it('Regular request by stream but irreglar subscription returns status code 500', () => {
+    it('Regular request but irreglar subscription returns status code 200', () => {
       initialSubscriptions[0].condition.hits = 0
       return Subscription.asyncCreate(initialSubscriptions[0]).then(subscription => {
         invalidSubscriptionId = subscription.get('id')
-        return wrapped.run({id: invalidSubscriptionId}).then(response => expect(response.statusCode).to.be.equal(500))
+        return wrapped.run({id: invalidSubscriptionId}).then(response => expect(response.statusCode).to.be.equal(200))
       })
     })
 
@@ -56,22 +59,14 @@ describe('Products', () => {
     })
   })
 
-  describe('Notify', () => {
-    const wrapped = mochaPlugin.getWrapper('productsNotify', '/products.js', 'notify')
-    const stream = {
-      Records: [
-        { eventName: 'INSERT', dynamodb: { NewImage: marshaler.marshalItem(initialProduct) } }
-      ]
-    }
-    it('Regular request succeed', () => {
-      return wrapped.run(stream).then(response => expect(response.statusCode).to.be.equal(200))
-    })
-  })
-
   describe('RemindNotify', () => {
     const wrapped = mochaPlugin.getWrapper('productsRemindNotify', '/products.js', 'remindNotify')
     it('Regular request succeed', () => {
       return wrapped.run({productId: initialProduct.id}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+
+    it('Regular request with slack true succeed', () => {
+      return wrapped.run({productId: initialProduct.id, slack: true}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 
@@ -79,6 +74,10 @@ describe('Products', () => {
     const wrapped = mochaPlugin.getWrapper('productsSearchTorrentAndNotify', '/products.js', 'searchTorrentAndNotify')
     it('Regular request succeed', () => {
       return wrapped.run({productId: initialProduct.id}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+
+    it('Regular request with slack true succeed', () => {
+      return wrapped.run({productId: initialProduct.id, slack: true}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 

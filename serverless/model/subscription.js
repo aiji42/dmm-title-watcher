@@ -16,7 +16,8 @@ Subscription.prototype.getProductsByAPI = async function() {
     return items.filter(item => ! this.isMatchedExcept(item)).map(item => new Product({id: item.product_id, info: item}))
   } catch (err) {
     await Subscription.asyncUpdate({id: this.get('id'), failedCount: this.get('failedCount') + 1})
-    throw err
+    if (err.message != 'API error: 400 unknown error') throw err
+    return []
   }
 }
 

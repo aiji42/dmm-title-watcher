@@ -3,9 +3,7 @@
 const { Product } = require('./table-schema')
 const { Torrent } = require('./torrent')
 const { Bookmark } = require('./bookmark')
-const { WebClient } = require('@slack/web-api')
-const slack = new WebClient(process.env.SLACK_TOKEN)
-const channel = process.env.SLACK_CHANNEL_ID
+const { SlackClient } = require('../util/slack-client')
 const { si } = require('nyaapi')
 
 Product.prototype.isBookmarked = async function() {
@@ -15,18 +13,17 @@ Product.prototype.isBookmarked = async function() {
 
 Product.prototype.searchTorrent = function() {
   const pattern = /([a-zA-Z]{3,4}).*(\d{3})$/
-  const query = [
-    `${pattern.exec(this.get('id'))[1]} ${pattern.exec(this.get('id'))[2]}`,
-    null,             // リミットなし
-    {category: '2_2'} // カテゴリ 実写
-  ]
-  return new Promise((resolve, reject) => {
-    si.search(...query)
-    .then(results => {
-      resolve(results)
-    })
-    .catch(reject)
-  })
+  const term = `${pattern.exec(this.get('id'))[1]} ${pattern.exec(this.get('id'))[2]}`
+  return si.search(term, null, {category: '2_2'})
+}
+
+Product.asyncCreateAndNotifyIfNew = async function(productData) {
+  try {
+    const product = await this.asyncCreate(productData, {overwrite: false})
+    await SlackClient.postProduct('新着タイトルが見つかりました。', product)
+  } catch (err) {
+    if (err.code != 'ConditionalCheckFailedException') throw err
+  }
 }
 
 Product.prototype.createTorrent = function(torrentInfo) {
