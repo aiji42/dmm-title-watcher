@@ -22,13 +22,11 @@ provider:
     LAMBDA_NAME_SUBSCRIPTIONS_DELETE: ${self:service}-${self:provider.stage}-subscriptionsDelete
     LAMBDA_NAME_SUBSCRIPTIONS_SUBSCRIBE_ACTRESS:
       ${self:service}-${self:provider.stage}-subscriptionsSubscribeActerss
-    LAMBDA_NAME_PRODUCTS_SEARCH: ${self:service}-${self:provider.stage}-productsSearch
-    LAMBDA_NAME_PRODUCTS_REMIND_NOTIFY:
-      ${self:service}-${self:provider.stage}-productsRemindNotify
-    LAMBDA_NAME_PRODUCTS_SEARCH_TORRENT_AND_NOTIFY:
-      ${self:service}-${self:provider.stage}-productsSearchTorrentAndNotify
+    LAMBDA_NAME_SUBSCRIPTIONS_SEARCH: ${self:service}-${self:provider.stage}-subscriptionsSearch
     LAMBDA_NAME_BOOKMARKS_CREATE: ${self:service}-${self:provider.stage}-bookmarksCreate
     LAMBDA_NAME_BOOKMARKS_DELETE: ${self:service}-${self:provider.stage}-bookmarksDelete
+    LAMBDA_NAME_BOOKMARKS_SEARCH_TORRENT_AND_NOTIFY:
+      ${self:service}-${self:provider.stage}-bookmarksSearchTorrentAndNotify
     BUCKET_TRANSMISSION_PROJECT: ${env:BUCKET_TRANSMISSION_PROJECT}
   iamRoleStatements:
     - Effect: Allow
@@ -123,16 +121,12 @@ functions:
       - http:
           path: subscriptions/{id}
           method: delete
-  productsSearch:
-    handler: products.search
-  productsSearchAll:
-    handler: products.searchAll
+  subscriptionsSearch:
+    handler: subscriptions.search
+  subscriptionsSearchAll:
+    handler: subscriptions.searchAll
     events:
       - schedule: cron(45 23 * * ? *) # JST 8:45 AM
-  productsRemindNotify:
-    handler: products.remindNotify
-  productsSearchTorrentAndNotify:
-    handler: products.searchTorrentAndNotify
   bookmarksCreate:
     handler: bookmarks.create
     events:
@@ -153,6 +147,8 @@ functions:
     handler: bookmarks.searchAllTorrentable
     events:
       - schedule: cron(50 23 * * ? *) # JST 8:50 AM
+  bookmarksSearchTorrentAndNotify:
+    handler: bookmarks.searchTorrentAndNotify
   torrentsDownload:
     handler: torrents.download
     events:

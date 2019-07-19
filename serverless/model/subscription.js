@@ -40,9 +40,9 @@ Subscription.prototype.isMatchedExcept = function(product) {
   }).some(res => res)
 }
 
-Subscription.prototype.invokeProductsSearch = function(options = {}) {
+Subscription.prototype.invokeSearch = function(options = {}) {
   return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_PRODUCTS_SEARCH,
+    FunctionName: process.env.LAMBDA_NAME_SUBSCRIPTIONS_SEARCH,
     InvocationType: 'Event',
     Payload: JSON.stringify({id: this.get('id'), ...options})
   }).promise()

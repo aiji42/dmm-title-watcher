@@ -1,20 +1,12 @@
 'use strict'
 
 const { Product } = require('./table-schema')
-const { Torrent } = require('./torrent')
 const { Bookmark } = require('./bookmark')
 const { SlackClient } = require('../util/slack-client')
-const { si } = require('nyaapi')
 
 Product.prototype.isBookmarked = async function() {
   const bookmark = await Bookmark.asyncGet(this.get('id'))
   return bookmark ? true : false
-}
-
-Product.prototype.searchTorrent = function() {
-  const pattern = /([a-zA-Z]{3,4}).*(\d{3})$/
-  const term = `${pattern.exec(this.get('id'))[1]} ${pattern.exec(this.get('id'))[2]}`
-  return si.search(term, null, {category: '2_2'})
 }
 
 Product.asyncCreateAndNotifyIfNew = async function(productData) {
@@ -24,11 +16,6 @@ Product.asyncCreateAndNotifyIfNew = async function(productData) {
   } catch (err) {
     if (err.code != 'ConditionalCheckFailedException') throw err
   }
-}
-
-Product.prototype.createTorrent = function(torrentInfo) {
-  const torrentId = /.*\/(\d+)$/.exec(torrentInfo.links.page)[1]
-  return Torrent.asyncCreate({productId: this.get('id'), torrentId: torrentId, info: torrentInfo})
 }
 
 Product.prototype.title = function() {

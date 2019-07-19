@@ -35,13 +35,38 @@ module.exports.delete = async (event) => {
 }
 
 module.exports.remind = async (event) => {
-  const bookmarks = (await Bookmark.scanRemindable()).Items
-  await Promise.all(bookmarks.map(bookmark => bookmark.invokeRemindNotify({slack: true})))
-  return {statusCode: 200}
+  try {
+    const bookmarks = (await Bookmark.scanRemindable()).Items
+    const notify = async (bmk) => {
+      const product = await Product.asyncGet(bmk.get('productId'))
+      return SlackClient.postProduct('【リマインド】本日発売日です。', product)
+    }
+    await Promise.all(bookmarks.map(bookmark => notify(bookmark)))
+    return {statusCode: 200, body: 'Sucessfully bookmark remind'}
+  } catch (err) {
+    console.log('[ERROR] ', err)
+    return {statusCode: 500, body: err.message}
+  }
 }
 
 module.exports.searchAllTorrentable = async (event) => {
   const bookmarks = (await Bookmark.scanTorrentable()).Items
   await Promise.all(bookmarks.map(bookmark => bookmark.invokeSearchTorrentAndNotify({slack: true})))
   return {statusCode: 200}
+}
+
+module.exports.searchTorrentAndNotify = async (event) => {
+  try {
+    const bookmark = await Bookmark.asyncGet(event.productId)
+    const torrentInfos = await bookmark.searchTorrent()
+    if (torrentInfos.length > 0) {
+      const torrents = await Promise.all(torrentInfos.map(torrentInfo => bookmark.createTorrent(torrentInfo)))
+      const product = await Product.asyncGet(bookmark.get('productId'))
+      await SlackClient.postProductWithTorrents(product, torrents)
+    }
+    return {statusCode: 200, body: 'Sucessfully product search torrent and notify'}
+  } catch (err) {
+    console.log('[ERROR] ', err)
+    return {statusCode: 500, body: err.message}
+  }
 }

@@ -169,7 +169,7 @@ const replaceProduct = async (responseURL, text, product) => {
 
 const postProductWithTorrents = async (product, torrents) => {
   const attachments = await makeAttachmentProduct(product)
-  attachments.push(torrents.map(torrent => makeAttachmentTorrent(torrent)))
+  torrents.forEach(torrent => attachments.push(makeAttachmentTorrent(torrent)))
   await slack.chat.postMessage({
     channel: channel,
     text: 'Torrentファイル発見',
