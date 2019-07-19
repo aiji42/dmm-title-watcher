@@ -32,7 +32,6 @@ module.exports.subscribeGenre = async (event) => {
 const create = async (data) => {
   const subscription = await Subscription.asyncCreate(data)
   await SlackClient.post(`購読条件: ${subscription.get('name')}を作製しました。`)
-  await subscription.invokeSearchProducts()
 }
 
 module.exports.index = async (event) => {
