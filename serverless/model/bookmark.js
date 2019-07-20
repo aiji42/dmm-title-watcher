@@ -45,6 +45,17 @@ Bookmark.prototype.createTorrent = function(torrentInfo) {
   return Torrent.asyncCreate({productId: this.get('productId'), torrentId: torrentId, info: torrentInfo})
 }
 
+Bookmark.asyncAll = function(attributes) {
+  return new Promise((resolve, reject) => {
+    this.scan()
+    .attributes(attributes)
+    .exec((err, data) => {
+      if (err) reject(err)
+      else resolve(data)
+    })
+  })
+}
+
 Bookmark.invokeCreate = function(productId) {
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_CREATE,
@@ -63,6 +74,14 @@ Bookmark.invokeDelete = function(productId) {
 
 Bookmark.prototype.invokeDelete = function(options = {}) {
   return Bookmark.invokeDelete(this.get('productId'))
+}
+
+Bookmark.invokeIndex = function() {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_INDEX,
+    InvocationType: 'Event',
+    Payload: ''
+  }).promise()
 }
 
 Bookmark.prototype.invokeSearchTorrentAndNotify = function() {

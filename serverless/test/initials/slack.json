@@ -48,7 +48,7 @@
       {
         "name": "delete",
         "type": "button",
-        "value": "asdfghjklqwertyuio"
+        "value": ""
       }
     ],
     "callback_id": "subscription",

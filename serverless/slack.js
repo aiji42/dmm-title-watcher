@@ -28,6 +28,7 @@ module.exports.command = async (event, context, callback) => {
   const command = qs.parse(event.body).command
   const text = qs.parse(event.body).text
   if (command == '/subscriptions') await Subscription.invokeIndex()
+  if (command == '/bookmarks')     await Bookmark.invokeIndex()
   if (command == '/actress')       await actress(text)
   if (command == '/genre')         await genre(text)
   return {statusCode: 200}

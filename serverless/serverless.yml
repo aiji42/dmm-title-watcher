@@ -26,6 +26,7 @@ provider:
     LAMBDA_NAME_SUBSCRIPTIONS_SEARCH_PRODUCTS: ${self:service}-${self:provider.stage}-subscriptionsSearchProducts
     LAMBDA_NAME_BOOKMARKS_CREATE: ${self:service}-${self:provider.stage}-bookmarksCreate
     LAMBDA_NAME_BOOKMARKS_DELETE: ${self:service}-${self:provider.stage}-bookmarksDelete
+    LAMBDA_NAME_BOOKMARKS_INDEX: ${self:service}-${self:provider.stage}-bookmarksIndex
     LAMBDA_NAME_BOOKMARKS_SEARCH_TORRENT_AND_NOTIFY:
       ${self:service}-${self:provider.stage}-bookmarksSearchTorrentAndNotify
     BUCKET_TRANSMISSION_PROJECT: ${env:BUCKET_TRANSMISSION_PROJECT}
@@ -104,6 +105,8 @@ functions:
     handler: bookmarks.create
   bookmarksDelete:
     handler: bookmarks.delete
+  bookmarksIndex:
+    handler: bookmarks.index
   bookmarksRemind:
     handler: bookmarks.remind
     events:

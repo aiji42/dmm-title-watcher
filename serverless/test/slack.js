@@ -36,7 +36,10 @@ describe('Slack', () => {
       return wrapped.run({body: `payload=${JSON.stringify(initialSlack[3])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
     it('Regular request (subscription delete) returns status code 200', () => {
-      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[4])}`}).then(response => expect(response.statusCode).to.be.equal(200))
+      Subscription.asyncAll(['id']).then(data => {
+        initialSlack[4].actions[0].value = data.Items[0].get('id')
+        return wrapped.run({body: `payload=${JSON.stringify(initialSlack[4])}`}).then(response => expect(response.statusCode).to.be.equal(200))
+      })
     })
   })
 
@@ -44,6 +47,9 @@ describe('Slack', () => {
     const wrapped = mochaPlugin.getWrapper('slackCommand', '/slack.js', 'command')
     it('Regular request (/subscriptions) returns status code 200', () => {
       return wrapped.run({body: 'command=/subscriptions'}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+    it('Regular request (/bookmarks) returns status code 200', () => {
+      return wrapped.run({body: 'command=/bookmarks'}).then(response => expect(response.statusCode).to.be.equal(200))
     })
     it('Regular request (/actress) returns status code 200', () => {
       return wrapped.run({body: 'command=/actress&text=深田えいみ'}).then(response => {

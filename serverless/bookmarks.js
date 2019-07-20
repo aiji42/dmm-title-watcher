@@ -24,6 +24,12 @@ module.exports.delete = async (event) => {
   return {statusCode: 200}
 }
 
+module.exports.index = async (event) => {
+  const bookmarks = (await Bookmark.asyncAll(['productId', 'productInfo', 'saleStartDate'])).Items
+  await SlackClient.postBookmarks(bookmarks)
+  return {statusCode: 200}
+}
+
 module.exports.remind = async (event) => {
   const bookmarks = (await Bookmark.scanRemindable()).Items
   const products = await Product.asyncGetItems(bookmarks.map(bookmark => bookmark.get('productId')))

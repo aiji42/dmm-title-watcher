@@ -23,6 +23,29 @@ const makeAttachmentSubscription = (subscription) => {
   }
 }
 
+const makeAttachmentBookmark = (bookmark) => {
+  return {
+    title: bookmark.get('productInfo').title,
+    title_link: bookmark.get('productInfo').URL,
+    text: `発売日: ${bookmark.get('saleStartDate').slice(0, 10)}`,
+    callback_id: 'bookmark',
+    actions: [
+      {
+        type: 'button',
+        name: 'delete',
+        text: '解除する',
+        value: bookmark.get('productId'),
+        style: 'danger',
+        confirm: {
+          title: 'ブックマークを解除しますか？',
+          ok_text: 'Yes',
+          dismiss_text: 'No'
+        }
+      }
+    ]
+  }
+}
+
 const makeAttachmentActress = (actress) => {
   const attachment = {
     title: actress.name,
@@ -148,6 +171,14 @@ const postSubscriptions = async (subscriptions) => {
   })
 }
 
+const postBookmarks = async (bookmarks) => {
+  await slack.chat.postMessage({
+    channel: channel,
+    text: 'ブックマーク一覧',
+    attachments: bookmarks.map(bookmark => makeAttachmentBookmark(bookmark))
+  })
+}
+
 const postActresses = async (keyword, actresses) => {
   await slack.chat.postMessage({
     channel: channel,
@@ -204,6 +235,7 @@ const genreDMMLink = genre => {
 module.exports.SlackClient = {
   post: post,
   postSubscriptions: postSubscriptions,
+  postBookmarks: postBookmarks,
   postActresses: postActresses,
   postGenres: postGenres,
   postProduct: postProduct,

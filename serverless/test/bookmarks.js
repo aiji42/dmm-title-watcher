@@ -37,6 +37,13 @@ describe('Bookmarks', () => {
     })
   })
 
+  describe('Index', () => {
+    const wrapped = mochaPlugin.getWrapper('bookmarksIndex', '/bookmarks.js', 'index')
+    it('Regular request returns status code 200', () => {
+      return wrapped.run({}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+  })
+
   describe('Remind', () => {
     const wrapped = mochaPlugin.getWrapper('bookmarksRemind', '/bookmarks.js', 'remind')
     it('Succeed remind', () => {
