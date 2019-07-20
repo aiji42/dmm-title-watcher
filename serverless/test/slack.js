@@ -32,8 +32,11 @@ describe('Slack', () => {
     it('Regular request (subscription actress) returns status code 200', () => {
       return wrapped.run({body: `payload=${JSON.stringify(initialSlack[2])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
-    it('Regular request (subscription delete) returns status code 200', () => {
+    it('Regular request (subscription genre) returns status code 200', () => {
       return wrapped.run({body: `payload=${JSON.stringify(initialSlack[3])}`}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+    it('Regular request (subscription delete) returns status code 200', () => {
+      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[4])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 
@@ -44,6 +47,11 @@ describe('Slack', () => {
     })
     it('Regular request (/actress) returns status code 200', () => {
       return wrapped.run({body: 'command=/actress&text=深田えいみ'}).then(response => {
+        expect(response.statusCode).to.be.equal(200)
+      })
+    })
+    it('Regular request (/genre) returns status code 200', () => {
+      return wrapped.run({body: 'command=/genre&text=でびゅーさくひん'}).then(response => {
         expect(response.statusCode).to.be.equal(200)
       })
     })

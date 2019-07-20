@@ -2,7 +2,6 @@
 
 const { Product } = require('./table-schema')
 const { Bookmark } = require('./bookmark')
-const { SlackClient } = require('../util/slack-client')
 
 Product.prototype.isBookmarked = async function() {
   const bookmark = await Bookmark.asyncGet(this.get('id'))
@@ -39,10 +38,6 @@ Product.prototype.actresses = function() {
 
 Product.prototype.genres = function() {
   return this.get('info').iteminfo.genre || []
-}
-
-Product.prototype.bookmarkLink = function() {
-  return `${process.env.GW_URL}/products/${this.get('id')}/bookmarks/create`
 }
 
 module.exports.Product = Product

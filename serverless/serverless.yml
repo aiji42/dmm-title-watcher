@@ -102,16 +102,8 @@ functions:
       - schedule: cron(45 23 * * ? *) # JST 8:45 AM
   bookmarksCreate:
     handler: bookmarks.create
-    events:
-      - http:
-          path: /products/{id}/bookmarks
-          method: post
   bookmarksDelete:
     handler: bookmarks.delete
-    events:
-      - http:
-          path: /products/{id}/bookmarks
-          method: delete
   bookmarksRemind:
     handler: bookmarks.remind
     events:

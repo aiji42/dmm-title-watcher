@@ -2,7 +2,6 @@
 
 const AWS = require('aws-sdk')
 const { Bookmark } = require('./table-schema')
-const { Product } = require('./product')
 const { Torrent } = require('./torrent')
 const { si } = require('nyaapi')
 
@@ -46,32 +45,32 @@ Bookmark.prototype.createTorrent = function(torrentInfo) {
   return Torrent.asyncCreate({productId: this.get('productId'), torrentId: torrentId, info: torrentInfo})
 }
 
-Bookmark.invokeCreate = function(productId, options = {}) {
+Bookmark.invokeCreate = function(productId) {
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_CREATE,
     InvocationType: 'Event',
-    Payload: JSON.stringify({pathParameters: {id: productId}, ...options})
+    Payload: JSON.stringify({id: productId})
   }).promise()
 }
 
-Bookmark.invokeDelete = function(productId, options = {}) {
+Bookmark.invokeDelete = function(productId) {
   return lambda.invoke({
     FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_DELETE,
     InvocationType: 'Event',
-    Payload: JSON.stringify({pathParameters: {id: productId}, ...options})
-  }).promise()
-}
-
-Bookmark.prototype.invokeSearchTorrentAndNotify = function(options = {}) {
-  return lambda.invoke({
-    FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_SEARCH_TORRENT_AND_NOTIFY,
-    InvocationType: 'Event',
-    Payload: JSON.stringify({productId: this.get('productId'), ...options})
+    Payload: JSON.stringify({id: productId})
   }).promise()
 }
 
 Bookmark.prototype.invokeDelete = function(options = {}) {
-  return Bookmark.invokeDelete(this.get('productId'), options)
+  return Bookmark.invokeDelete(this.get('productId'))
+}
+
+Bookmark.prototype.invokeSearchTorrentAndNotify = function() {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_BOOKMARKS_SEARCH_TORRENT_AND_NOTIFY,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({id: this.get('productId')})
+  }).promise()
 }
 
 module.exports.Bookmark = Bookmark

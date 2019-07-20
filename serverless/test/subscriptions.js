@@ -75,6 +75,10 @@ describe('Subscriptions', () => {
     it('Regular request returns status code 200', () => {
       return wrapped.run({id: subscriptionId}).then(response => expect(response.statusCode).to.be.equal(200))
     })
+
+    it('Deleted Subscription', () => {
+      return Subscription.asyncGet(subscriptionId).then(subscription => expect(subscription).to.be.null)
+    })
   })
 
   after(done => {

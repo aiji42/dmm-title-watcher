@@ -48,6 +48,29 @@ const makeAttachmentActress = (actress) => {
   return attachment
 }
 
+const makeAttachmentGenre = (genre) => {
+  return {
+    title: genre.name,
+    title_link: genreDMMLink(genre),
+    callback_id: 'subscription',
+    actions: [
+      {
+        type: 'button',
+        name: 'genre',
+        text: '購読する',
+        value: genre.ruby,
+        style: 'primary',
+        confirm: {
+          title: '購読しますか？',
+          text: genre.name,
+          ok_text: 'Yes',
+          dismiss_text: 'No'
+        }
+      }
+    ]
+  }
+}
+
 const makeAttachmentProduct = async (product) => {
   const actresses = product.actresses().map(actress => `<${actressDMMLink(actress)}|${actress.name}>`)
   const genres = product.genres().map(genre => genre.name)
@@ -133,6 +156,14 @@ const postActresses = async (keyword, actresses) => {
   })
 }
 
+const postGenres = async (keyword, genres) => {
+  await slack.chat.postMessage({
+    channel: channel,
+    text: `"${keyword}" が見つかりました。`,
+    attachments: genres.map(genre => makeAttachmentGenre(genre))
+  })
+}
+
 const postProduct = async (text, product) => {
   const attachment = await makeAttachmentProduct(product)
   await slack.chat.postMessage({
@@ -153,7 +184,7 @@ const postSubscriptionSearchProducts = async (subscription, products) => {
 }
 
 const postProductWithTorrents = async (product, torrents) => {
-  const attachments = await makeAttachmentProduct(product)
+  const attachments = [await makeAttachmentProduct(product)]
   torrents.forEach(torrent => attachments.push(makeAttachmentTorrent(torrent)))
   await slack.chat.postMessage({
     channel: channel,
@@ -166,10 +197,15 @@ const actressDMMLink = actress => {
   return `https://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=${actress.id}/sort=date/`
 }
 
+const genreDMMLink = genre => {
+  return `https://www.dmm.co.jp/digital/videoa/-/list/=/article=keyword/id=${genre.genre_id}/sort=date/`
+}
+
 module.exports.SlackClient = {
   post: post,
   postSubscriptions: postSubscriptions,
   postActresses: postActresses,
+  postGenres: postGenres,
   postProduct: postProduct,
   postProductWithTorrents: postProductWithTorrents,
   postSubscriptionSearchProducts: postSubscriptionSearchProducts

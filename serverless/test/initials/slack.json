@@ -35,9 +35,20 @@
   {
     "actions": [
       {
+        "name": "genre",
+        "type": "button",
+        "value": "でびゅーさくひん"
+      }
+    ],
+    "callback_id": "subscription",
+    "original_message": {}
+  },
+  {
+    "actions": [
+      {
         "name": "delete",
         "type": "button",
-        "value": ""
+        "value": "asdfghjklqwertyuio"
       }
     ],
     "callback_id": "subscription",
