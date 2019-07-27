@@ -26,14 +26,14 @@ Torrent.prototype.digest = function() {
 
 Torrent.prototype.download = function() {
   return new Promise((resolve, reject) => {
-    request.get(this.get('info').links.file, (err, response, body) => {
+    request.get(this.get('info').links.file, {encoding: null}, (err, response) => {
       if (err) {
         reject(err)
       } else {
         const params = {
           Bucket: process.env.BUCKET_TRANSMISSION_PROJECT,
           Key: this.keyOnS3Bucket(),
-          Body: body
+          Body: response.body
         }
         s3.putObject(params, (err) => {
           if (err) {
