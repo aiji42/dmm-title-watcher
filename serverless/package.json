@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "./script/create-s3-dev-buckets.sh && (sls offline -s test -P 3001 > /dev/null 2>&1 & sleep 2) && sls invoke test --stage test -t 10000 --exit"
+    "test": "./script/create-s3-dev-buckets.sh && (sls offline -s test -P 3001 > /dev/null 2>&1 & sleep 2) && sls invoke test --stage test -t 60000 --exit"
   },
   "author": "",
   "license": "MIT",

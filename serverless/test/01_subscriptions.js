@@ -24,16 +24,9 @@ describe('Subscriptions', () => {
     })
   })
 
-  describe('SubscribeGenre', () => {
-    const wrapped = mochaPlugin.getWrapper('subscriptionsSubscribeGenre', '/subscriptions.js', 'subscribeGenre')
-    it('Regular request returns status code 200', () => {
-      return wrapped.run({keyword: 'でびゅーさくひん'}).then(response => expect(response.statusCode).to.be.equal(200))
-    })
-  })
-
-  describe('Index', () => {
-    const wrapped = mochaPlugin.getWrapper('subscriptionsIndex', '/subscriptions.js', 'index')
-    it('Regular request returns status code 200', () => {
+  describe('BulkSearchProducts', () => {
+    const wrapped = mochaPlugin.getWrapper('subscriptionsBulkSearchProducts', '/subscriptions.js', 'bulkSearchProducts')
+    it('Regular request succeed', () => {
       return wrapped.run({}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
@@ -43,7 +36,7 @@ describe('Subscriptions', () => {
       (async () => {
         const subscriptions = (await Subscription.asyncAll(['id', 'name'])).Items
         subscriptions.forEach(subscription => {
-          if (subscription.get('name') == '新着 デビュー作品') subscriptionId = subscription.get('id')
+          if (subscription.get('name') == '新着 天使もえ') subscriptionId = subscription.get('id')
         })
         done()
       })()
@@ -59,9 +52,16 @@ describe('Subscriptions', () => {
     })
   })
 
-  describe('BulkSearchProducts', () => {
-    const wrapped = mochaPlugin.getWrapper('subscriptionsBulkSearchProducts', '/subscriptions.js', 'bulkSearchProducts')
-    it('Regular request succeed', () => {
+  describe('SubscribeGenre', () => {
+    const wrapped = mochaPlugin.getWrapper('subscriptionsSubscribeGenre', '/subscriptions.js', 'subscribeGenre')
+    it('Regular request returns status code 200', () => {
+      return wrapped.run({keyword: 'でびゅーさくひん'}).then(response => expect(response.statusCode).to.be.equal(200))
+    })
+  })
+
+  describe('Index', () => {
+    const wrapped = mochaPlugin.getWrapper('subscriptionsIndex', '/subscriptions.js', 'index')
+    it('Regular request returns status code 200', () => {
       return wrapped.run({}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
