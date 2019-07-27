@@ -4,8 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "./script/create-s3-dev-buckets.sh && (sls offline -s test -P 3001 > /dev/null 2>&1 & sleep 2) && sls invoke test --stage test -t 10000 --exit",
-    "postinstall": "patch-package"
+    "test": "./script/create-s3-dev-buckets.sh && (sls offline -s test -P 3001 > /dev/null 2>&1 & sleep 2) && sls invoke test --stage test -t 10000 --exit"
   },
   "author": "",
   "license": "MIT",
@@ -13,12 +12,11 @@
     "@slack/web-api": "^5.0.1",
     "dmm.js": "^0.1.0",
     "dynamodb": "^1.2.0",
-    "nyaapi": "^2.0.7",
+    "nyaapi": "git://github.com/aiji42/Nyaapi.git",
     "querystring": "^0.2.0"
   },
   "devDependencies": {
     "aws-sdk": "^2.493.0",
-    "patch-package": "^6.1.2",
     "serverless-mocha-plugin": "^1.10.0",
     "serverless-offline": "^5.7.3"
   }

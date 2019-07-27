@@ -53,5 +53,16 @@
     ],
     "callback_id": "subscription",
     "original_message": {}
+  },
+  {
+    "actions": [
+      {
+        "name": "download",
+        "type": "button",
+        "value": ""
+      }
+    ],
+    "callback_id": "torrent",
+    "original_message": {}
   }
 ]

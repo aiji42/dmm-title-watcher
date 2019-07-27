@@ -39,7 +39,7 @@ module.exports.remind = async (event) => {
 
 module.exports.searchAllTorrentable = async (event) => {
   const bookmarks = (await Bookmark.scanTorrentable()).Items
-  await Promise.all(bookmarks.map(bookmark => bookmark.invokeSearchTorrentAndNotify({slack: true})))
+  await Promise.all(bookmarks.map(bookmark => bookmark.invokeSearchTorrentAndNotify()))
   return {statusCode: 200}
 }
 

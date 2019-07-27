@@ -18,7 +18,7 @@ describe('Torrents', () => {
   describe('Download', () => {
     const wrapped = mochaPlugin.getWrapper('torrentsDownload', '/torrents.js', 'download')
     it('Regular request succeed', () => {
-      return wrapped.run({pathParameters: {id: initialTorrent.productId, torrentId: initialTorrent.torrentId}}).then(response => expect(response.statusCode).to.be.equal(200))
+      return wrapped.run({productId: initialTorrent.productId, torrentId: initialTorrent.torrentId}).then(response => expect(response.statusCode).to.be.equal(200))
     })
     it('Torrent status is running', () => {
       Torrent.asyncGet(initialTorrent.productId, initialTorrent.torrentId)

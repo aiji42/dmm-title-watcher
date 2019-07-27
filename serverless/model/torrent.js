@@ -2,10 +2,13 @@
 
 const AWS = require('aws-sdk')
 const { Torrent } = require('./table-schema')
-const { Product } = require('./product')
-const { Bookmark } = require('./bookmark')
 const request = require('request')
-const fs = require('fs')
+const lambdaConfig = {}
+if (process.env.STAGE != 'prod') lambdaConfig.endpoint = process.env.GW_URL
+const lambda = new AWS.Lambda(lambdaConfig)
+const s3Config = { s3ForcePathStyle: true }
+if (process.env.STAGE != 'prod') s3Config.endpoint = 'http://s3:9000'
+const s3 = new AWS.S3(s3Config)
 
 Torrent.prototype.digest = function() {
   const date = new Date(this.get('info').timestamp * 1000)
@@ -21,15 +24,7 @@ Torrent.prototype.digest = function() {
   ].join('|')
 }
 
-Torrent.prototype.downloadLink = function() {
-  return `${process.env.GW_URL}/products/${this.get('productId')}/torrents/${this.get('torrentId')}/download`
-}
-
 Torrent.prototype.download = function() {
-  const s3Config = {s3ForcePathStyle: true}
-  if (process.env.STAGE != 'prod') s3Config.endpoint = 'http://s3:9000'
-  const s3 = new AWS.S3(s3Config)
-
   return new Promise((resolve, reject) => {
     request.get(this.get('info').links.file, (err, response, body) => {
       if (err) {
@@ -63,6 +58,14 @@ Torrent.prototype.keyOnS3Bucket = function() {
 
 Torrent.prototype.name = function() {
   return this.get('info').name
+}
+
+Torrent.invokeDownload = function(productId, torrentId) {
+  return lambda.invoke({
+    FunctionName: process.env.LAMBDA_NAME_TORRENTS_DOWNLOAD,
+    InvocationType: 'Event',
+    Payload: JSON.stringify({productId: productId, torrentId: torrentId})
+  }).promise()
 }
 
 module.exports.Torrent = Torrent

@@ -29,6 +29,7 @@ provider:
     LAMBDA_NAME_BOOKMARKS_INDEX: ${self:service}-${self:provider.stage}-bookmarksIndex
     LAMBDA_NAME_BOOKMARKS_SEARCH_TORRENT_AND_NOTIFY:
       ${self:service}-${self:provider.stage}-bookmarksSearchTorrentAndNotify
+    LAMBDA_NAME_TORRENTS_DOWNLOAD: ${self:service}-${self:provider.stage}-torrentsDownload
     BUCKET_TRANSMISSION_PROJECT: ${env:BUCKET_TRANSMISSION_PROJECT}
   iamRoleStatements:
     - Effect: Allow
@@ -119,10 +120,6 @@ functions:
     handler: bookmarks.searchTorrentAndNotify
   torrentsDownload:
     handler: torrents.download
-    events:
-      - http:
-          path: /products/{id}/torrents/{torrentId}/download
-          method: get
   slackActionEndpoint:
     handler: slack.actionEndpoint
     events:

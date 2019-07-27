@@ -3,6 +3,7 @@
 const qs = require('querystring')
 const { Bookmark } = require('./model/bookmark')
 const { Subscription } = require('./model/subscription')
+const { Torrent } = require('./model/torrent')
 const { DMMClient } = require('./util/dmm-client')
 const { SlackClient } = require('./util/slack-client')
 
@@ -19,6 +20,10 @@ module.exports.actionEndpoint = async (event, context, callback) => {
     if (name == 'actress') await Subscription.invokeSubscribeActress(value)
     if (name == 'genre')   await Subscription.invokeSubscribeGenre(value)
     if (name == 'delete')  await Subscription.invokeDelete(value)
+  }
+  if (data.callback_id == 'torrent') {
+    const val = JSON.parse(value)
+    if (name == 'download') await Torrent.invokeDownload(val.productId, val.torrentId)
   }
   return {statusCode: 200}
 }

@@ -5,8 +5,10 @@ const expect = mochaPlugin.chai.expect
 const { Product } = require('../model/product')
 const { Bookmark } = require('../model/bookmark')
 const { Subscription } = require('../model/subscription')
+const { Torrent } = require('../model/torrent')
 const initialProducts = require('./initials/product.json')
 const initialSubscriptions = require('./initials/subscription.json')
+const initialTorrents = require('./initials/torrent.json')
 const initialSlack = require('./initials/slack.json')
 
 describe('Slack', () => {
@@ -15,8 +17,10 @@ describe('Slack', () => {
       await Product.asyncCreateTable()
       await Bookmark.asyncCreateTable()
       await Subscription.asyncCreateTable()
+      await Torrent.asyncCreateTable()
       await Product.asyncCreate(initialProducts[0])
       await Subscription.asyncCreate(initialSubscriptions[0])
+      await Torrent.asyncCreate(initialTorrents[0])
       done()
     })()
   })
@@ -40,6 +44,10 @@ describe('Slack', () => {
         initialSlack[4].actions[0].value = data.Items[0].get('id')
         return wrapped.run({body: `payload=${JSON.stringify(initialSlack[4])}`}).then(response => expect(response.statusCode).to.be.equal(200))
       })
+    })
+    it('Regular request (torrent download) returns status code 200', () => {
+      initialSlack[5].actions[0].value = JSON.stringify({productId: initialTorrents[0].productId, torrentId: initialTorrents[0].torrentId})
+      return wrapped.run({body: `payload=${JSON.stringify(initialSlack[5])}`}).then(response => expect(response.statusCode).to.be.equal(200))
     })
   })
 
@@ -68,6 +76,7 @@ describe('Slack', () => {
       await Product.asyncDeleteTable()
       await Bookmark.asyncDeleteTable()
       await Subscription.asyncDeleteTable()
+      await Torrent.asyncDeleteTable()
       done()
     })()
   })

@@ -27,7 +27,7 @@ Subscription.prototype.searchProductsAndNotify = async function() {
   const productDatas = await this.searchProducts()
   let products = await Promise.all(productDatas.map(data => Product.createOnlyNew({id: data.product_id, info: data})))
   products = products.filter(product => product)
-  if (products.length > 0) SlackClient.postSubscriptionSearchProducts(this, products)
+  if (products.length > 0) await SlackClient.postSubscriptionSearchProducts(this, products)
 }
 
 Subscription.prototype.searchProducts = async function() {
