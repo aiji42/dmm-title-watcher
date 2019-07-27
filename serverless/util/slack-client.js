@@ -164,14 +164,14 @@ const makeAttachmentTorrent = torrent => {
 }
 
 const post = async (text) => {
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: text
   })
 }
 
 const postSubscriptions = async (subscriptions) => {
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: '購読条件一覧',
     attachments: subscriptions.map(subscription => makeAttachmentSubscription(subscription))
@@ -179,7 +179,7 @@ const postSubscriptions = async (subscriptions) => {
 }
 
 const postBookmarks = async (bookmarks) => {
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: 'ブックマーク一覧',
     attachments: bookmarks.map(bookmark => makeAttachmentBookmark(bookmark))
@@ -187,7 +187,7 @@ const postBookmarks = async (bookmarks) => {
 }
 
 const postActresses = async (keyword, actresses) => {
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: `"${keyword}" で ${actresses.length}人の女優がみつかりました。`,
     attachments: actresses.map(actress => makeAttachmentActress(actress))
@@ -195,7 +195,7 @@ const postActresses = async (keyword, actresses) => {
 }
 
 const postGenres = async (keyword, genres) => {
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: `"${keyword}" が見つかりました。`,
     attachments: genres.map(genre => makeAttachmentGenre(genre))
@@ -204,7 +204,7 @@ const postGenres = async (keyword, genres) => {
 
 const postProduct = async (text, product) => {
   const attachment = await makeAttachmentProduct(product)
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: text,
     attachments: [attachment]
@@ -214,7 +214,7 @@ const postProduct = async (text, product) => {
 const postSubscriptionSearchProducts = async (subscription, products) => {
   const attachments = [await makeAttachmentSubscription(subscription)]
   const productAtts = await Promise.all(products.map(product => makeAttachmentProduct(product)))
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: `下記購読条件で ${products.length} 件のタイトルが新たに見つかりました。`,
     attachments: attachments.concat(productAtts)
@@ -224,7 +224,7 @@ const postSubscriptionSearchProducts = async (subscription, products) => {
 const postProductWithTorrents = async (product, torrents) => {
   const attachments = [await makeAttachmentProduct(product)]
   torrents.forEach(torrent => attachments.push(makeAttachmentTorrent(torrent)))
-  slack.chat.postMessage({
+  await slack.chat.postMessage({
     channel: channel,
     text: 'Torrentファイル発見',
     attachments: attachments
