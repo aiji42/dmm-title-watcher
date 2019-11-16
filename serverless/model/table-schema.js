@@ -22,7 +22,8 @@ const Subscription = dynamo.define('Subscription', {
     name: Joi.string(),
     condition: Joi.object(),
     exceptCondition: Joi.object(),
-    failedCount: Joi.number().default(0)
+    failedCount: Joi.number().default(0),
+    skipedCount: Joi.number().default(999999)
   }
 })
 

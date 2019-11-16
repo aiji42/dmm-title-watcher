@@ -33,10 +33,8 @@ Subscription.prototype.searchProductsAndNotify = async function() {
 Subscription.prototype.searchProducts = async function() {
   try {
     const items = (await DMMClient.asyncProduct(this.preparedCondition())).result.items
-    await Subscription.asyncUpdate({id: this.get('id'), failedCount: 0})
     return items.filter(item => ! this.isMatchedExcept(item))
   } catch (err) {
-    await Subscription.asyncUpdate({id: this.get('id'), failedCount: this.get('failedCount') + 1})
     throw err
   }
 }
@@ -58,17 +56,6 @@ Subscription.prototype.isMatchedExcept = function(product) {
       return product.iteminfo[key].map(info => info.id).includes(except)
     }).some(res => res)
   }).some(res => res)
-}
-
-Subscription.getActiveItems = function() {
-  return new Promise((resolve, reject) => {
-    this.scan()
-    .where('failedCount').lte(9)
-    .exec((err, data) => {
-      if (err) reject(err)
-      else resolve(data.Items)
-    })
-  })
 }
 
 Subscription.asyncAll = function(attributes) {
