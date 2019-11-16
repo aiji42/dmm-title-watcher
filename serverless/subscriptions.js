@@ -56,7 +56,7 @@ module.exports.searchProducts = async (event) => {
 module.exports.bulkSearchProducts = async (event) => {
   const subscriptions = await Subscription.asyncAll(['id', 'skipedCount'])
   // dmm apiの仕様上同時アクセスが20以下に設定されているため、余裕のある10に制限する
-  const sortedSubscriptions = Array.from(subscriptions).sort((a, b) => {
+  const sortedSubscriptions = subscriptions.map(s => s).sort((a, b) => {
     if (a.get('skipedCount') > b.get('skipedCount')) return -1
     if (a.get('skipedCount') < b.get('skipedCount')) return 1
     return 0;
