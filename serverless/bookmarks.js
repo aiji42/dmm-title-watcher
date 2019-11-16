@@ -30,13 +30,6 @@ module.exports.index = async (event) => {
   return {statusCode: 200}
 }
 
-module.exports.remind = async (event) => {
-  const bookmarks = (await Bookmark.scanRemindable()).Items
-  const products = await Product.asyncGetItems(bookmarks.map(bookmark => bookmark.get('productId')))
-  await Promise.all(products.map(product => SlackClient.postProduct('【リマインド】本日発売日です。', product)))
-  return {statusCode: 200}
-}
-
 module.exports.searchAllTorrentable = async (event) => {
   const bookmarks = (await Bookmark.scanTorrentable()).Items
   await Promise.all(bookmarks.map(bookmark => bookmark.invokeSearchTorrentAndNotify()))
