@@ -1,7 +1,6 @@
 'use strict'
 
 const { Subscription } = require('./model/subscription')
-const { Product } = require('./model/product')
 const { DMMClient } = require('./util/dmm-client')
 const { SlackClient } = require('./util/slack-client')
 
@@ -35,7 +34,7 @@ const create = async (data) => {
 }
 
 module.exports.index = async (event) => {
-  const subscriptions = (await Subscription.asyncAll(['id', 'name', 'failedCount'])).Items
+  const subscriptions = (await Subscription.asyncAll(['id', 'name'])).Items
   await SlackClient.postSubscriptions(subscriptions)
   return {statusCode: 200}
 }
@@ -55,7 +54,17 @@ module.exports.searchProducts = async (event) => {
 }
 
 module.exports.bulkSearchProducts = async (event) => {
-  const subscriptions = await Subscription.getActiveItems()
-  await Promise.all(subscriptions.map(subscription => subscription.invokeSearchProducts()))
+  const subscriptions = await Subscription.asyncAll(['id', 'skipedCount'])
+  // dmm apiの仕様上同時アクセスが20以下に設定されているため、余裕のある10に制限する
+  const sortedSubscriptions = subscriptions.Items.sort((a, b) => {
+    if (a.get('skipedCount') > b.get('skipedCount')) return -1
+    if (a.get('skipedCount') < b.get('skipedCount')) return 1
+    return 0;
+  })
+  const searchables = sortedSubscriptions.slice(0, 10)
+  const nonSearchables = sortedSubscriptions.slice(10)
+  await Promise.all(searchables.map(subscription => subscription.invokeSearchProducts()))
+  await Promise.all(searchables.map(subsc => Subscription.asyncUpdate({ id: subsc.get('id'), skipedCount: 0 })))
+  await Promise.all(nonSearchables.map(subsc => Subscription.asyncUpdate({ id: subsc.get('id'), skipedCount: subsc.get('skipedCount') + 1 })))
   return {statusCode: 200}
 }
