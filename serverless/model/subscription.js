@@ -43,7 +43,8 @@ Subscription.prototype.preparedCondition = function() {
   const condition = this.get('condition')
   Object.keys(condition).forEach(key => {
     if (typeof condition[key] != 'string') return
-    condition[key] = condition[key].replace(/#TODAY/, new Date().toISOString().slice(0, 19))
+    condition[key] = condition[key].replace(/#TODAY/, '2019-10-01T15:28:01')
+    // condition[key] = condition[key].replace(/#TODAY/, new Date().toISOString().slice(0, 19))
   })
   return condition
 }
