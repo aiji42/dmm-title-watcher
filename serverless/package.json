@@ -16,7 +16,7 @@
     "querystring": "^0.2.0"
   },
   "devDependencies": {
-    "aws-sdk": "^2.493.0",
+    "aws-sdk": "^2.814.0",
     "serverless-mocha-plugin": "^1.10.0",
     "serverless-offline": "^5.7.3"
   }
